@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Fire Monitoring System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link to the updated CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Home Fire Monitoring System</h1>
+    </header>
+
+    <main>
+        <section id="monitoring-section">
+            <div id="webcam-container">
+                <video id="camera-feed" autoplay muted playsinline></video>
+                <button id="analyze-button">Scan for Fire</button>
+            </div>
+            <div id="logs-container">
+                <h2>Detection Logs</h2>
+                <ul id="context-list"></ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 FireGuard Inc.</p>
+    </footer>
+
+    <!-- Link to the updated JavaScript file -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Automatically trigger fire scanning every 10 seconds
+        setInterval(() => {
+            const analyzeButton = document.getElementById('analyze-button');
+            if (analyzeButton) {
+                analyzeButton.click();
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
