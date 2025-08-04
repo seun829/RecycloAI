@@ -1,3 +1,5 @@
+from openai.types.chat import ChatCompletionUserMessageParam
+
 from flask import (
     Flask,
     render_template,
@@ -97,10 +99,10 @@ def process_image():
     image_url = f"data:image/jpeg;base64,{image_base64}"
 
     # Construct the messages as per OpenAI's vision API
-    messages = [
-        {
-            "role": "user",
-            "content": [
+    messages: list[ChatCompletionUserMessageParam] = [
+        ChatCompletionUserMessageParam(
+            role="user",
+            content=[
                 {
                     "type": "text",
                     "text": (
@@ -113,7 +115,7 @@ def process_image():
                     "image_url": {"url": image_url}
                 }
             ]
-        }
+        )
     ]
 
     try:
