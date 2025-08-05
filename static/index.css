@@ -5,11 +5,19 @@
   box-sizing: border-box;
 }
 
+/* Define color variables */
+:root {
+  --primary-color: #4CAF50;      /* green */
+  --primary-dark:  #388E3C;
+  --background:    #f4f7f6;
+  --text-color:    #333;
+}
+
 /* Body Styling */
 body {
   font-family: "Arial", sans-serif;
-  background-color: #f4f7f6;
-  color: #333;
+  background-color: var(--background);
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -17,7 +25,7 @@ body {
 
 /* Header Styling */
 header {
-  background-color: #ff5f5f;
+  background-color: var(--primary-color);
   color: #fff;
   padding: 20px;
   text-align: center;
@@ -36,7 +44,7 @@ main {
   padding: 20px;
 }
 
-#monitoring-section {
+#classification-section {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,7 +62,7 @@ main {
 
 #camera-feed {
   width: 100%;
-  border: 5px solid #ff5f5f;
+  border: 5px solid var(--primary-color);
   border-radius: 10px;
 }
 
@@ -63,17 +71,18 @@ main {
   bottom: 20px;
   right: 20px;
   padding: 12px 18px;
-  background-color: #ff5f5f;
+  background-color: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: 5px;
   font-size: 1em;
   cursor: pointer;
   opacity: 0.8;
-  transition: opacity 0.3s;
+  transition: background-color 0.3s, opacity 0.3s;
 }
 
 #analyze-button:hover {
+  background-color: var(--primary-dark);
   opacity: 1;
 }
 
@@ -89,7 +98,7 @@ main {
 
 #logs-container h2 {
   margin-bottom: 15px;
-  color: #ff5f5f;
+  color: var(--primary-color);
   font-size: 1.5em;
   text-align: center;
 }
@@ -106,7 +115,7 @@ main {
   padding: 12px;
   margin-bottom: 10px;
   border-radius: 5px;
-  border-left: 5px solid #ff5f5f;
+  border-left: 5px solid var(--primary-color);
   font-size: 1em;
 }
 

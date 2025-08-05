@@ -1,3 +1,4 @@
+/* Account Form Styling */
 .AccountForm {
   margin: 0;
   height: 100vh;
@@ -10,7 +11,7 @@
 
 .container {
   width: 400px;
-  max-width: 400px;
+  max-width: 100%;
   margin-top: 10vh;
   padding: 2rem;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
@@ -25,15 +26,20 @@
 }
 
 .form__button {
-  background-color: #c49851;
+  background-color: var(--primary-color);
   width: 100%;
-  border-color: black;
+  border-color: var(--primary-dark);
   font-weight: bold;
   color: #ffffff;
   font-size: 20px;
   border-radius: 4px;
   cursor: pointer;
   padding: 1rem 2rem;
+  transition: background-color 0.3s;
+}
+
+.form__button:hover {
+  background-color: var(--primary-dark);
 }
 
 .form__title {
@@ -54,42 +60,36 @@
   border: 1px solid #dddddd;
   outline: none;
   background: #eeeeee;
+  transition: border-color 0.3s, background-color 0.3s;
 }
 
 .form__input:focus {
-  border-color: #d17d17;
+  border-color: var(--primary-color);
   background: #ffffff;
 }
 
-.form__button:hover {
-  background: #a5691e;
-}
-
-.form__text {
-  text-align: center;
-}
-
 .form__link {
-  color: #252c6a;
+  color: var(--primary-dark);
   text-decoration: none;
   cursor: pointer;
-}
-
-.form__input-error-message {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #cc3333;
-}
-
-.form__input-message {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #00bd9b;
 }
 
 .form__link:hover {
   text-decoration: underline;
 }
+
+.form__input-error-message {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--error-color);
+}
+
+.form__input-message {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+}
+
 
 /* .form__message {
       text-align: center;

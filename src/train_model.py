@@ -86,8 +86,9 @@ def train(model, dataloaders, dataset_sizes, criterion, optimizer, device, num_e
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-dir', type=str, required=True,
-                        help='Directory with train/ and val/ subfolders')
+    parser.add_argument('--data-dir', type=str, default="data",
+                    help='Directory with train/ and val/ subfolders (default: ./data)')
+
     parser.add_argument('--epochs', type=int, default=10,
                         help='Number of training epochs')
     parser.add_argument('--batch-size', type=int, default=32,

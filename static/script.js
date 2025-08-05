@@ -1,4 +1,4 @@
-// This script controls the webcam and sends the captured image to the server for fire analysis.
+// This script controls the webcam and sends the captured image to the server for recyclability classification.
 
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("camera-feed");
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Convert canvas to base64 image
       const imageData = canvas.toDataURL("image/jpeg");
 
-      // Send image data to the server for analysis
+      // Send image data to the server for classification
       fetch("/process_image", {
           method: "POST",
           headers: {
@@ -37,9 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
               if (data.error) {
                   console.error("Error: ", data.error);
               } else {
-                  // Display the fire detection context in the list
+                  // Display the classification result in the list
                   const listItem = document.createElement("li");
-                  listItem.textContent = data.context;
+                  const label = data.label;       // "Recyclable" or "Not recyclable"
+                  const confidence = (data.confidence * 100).toFixed(1);
+                  listItem.textContent = `${label} — ${confidence}% confidence`;
                   contextList.appendChild(listItem);
               }
           })
