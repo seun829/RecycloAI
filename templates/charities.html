@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecycloAI – Verified Recycling Charities</title>
+  <header>
+    <h1>RecycloAI – Is It Recyclable?</h1>
+  </header>
+  <style>
+    :root {
+      --bg: #0f172a; /* slate-900 */
+      --panel: #111827; /* gray-900 */
+      --muted: #9ca3af; /* gray-400 */
+      --text: #e5e7eb; /* gray-200 */
+      --accent: #22d3ee; /* cyan-400 */
+      --accent-2: #a78bfa; /* violet-400 */
+      --danger: #f87171; /* red-400 */
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background: linear-gradient(180deg, #0b1220, var(--bg)); color: var(--text); }
+    header, footer { padding: 1rem 1.25rem; background: rgba(17,24,39,.6); backdrop-filter: blur(6px); border-bottom: 1px solid #1f2937; }
+    header h1 { margin: 0; font-size: 1.5rem; letter-spacing:.2px; }
+    main { padding: 1.25rem; max-width: 1100px; margin: 0 auto; }
+
+    /* Controls */
+    .controls { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: .75rem; align-items: end; background: rgba(17,24,39,.6); padding: 1rem; border:1px solid #1f2937; border-radius: 16px; }
+    .control { display: flex; flex-direction: column; gap: .35rem; }
+    label { font-size: .85rem; color: var(--muted); }
+    input, select { padding: .6rem .7rem; background: #030712; color: var(--text); border:1px solid #1f2937; border-radius: 10px; }
+    input::placeholder { color: #6b7280; }
+    button { cursor: pointer; border: none; border-radius: 12px; padding: .75rem 1rem; font-weight: 600; }
+    .btn-primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #0b1220; }
+    .btn-ghost { background: transparent; color: var(--text); border:1px solid #1f2937; }
+
+    /* Pills */
+    .pills { display:flex; gap:.5rem; flex-wrap: wrap; }
+    .pill { font-size: .75rem; padding: .25rem .5rem; border-radius: 999px; border:1px solid #1f2937; background:#0b1220; color:#cbd5e1; }
+
+    /* Results grid */
+    .results { margin-top: 1rem; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+    .card { display:flex; flex-direction: column; gap:.5rem; background: rgba(17,24,39,.65); border:1px solid #1f2937; border-radius: 18px; padding: 1rem; }
+    .card h3 { margin:0; font-size: 1.05rem; }
+    .meta { display:flex; gap:.5rem; flex-wrap: wrap; align-items:center; font-size:.85rem; color:#cbd5e1; }
+    .rating { font-weight:700; }
+    .verified { display:inline-flex; align-items:center; gap:.35rem; font-size:.8rem; color:#34d399; }
+    .verified svg { width: 14px; height: 14px; }
+    .actions { margin-top: auto; display:flex; gap:.5rem; }
+    .empty { text-align:center; color: var(--muted); padding: 2rem; border:1px dashed #374151; border-radius: 16px; }
+
+    .toolbar { margin-top: .75rem; display:flex; align-items:center; justify-content: space-between; gap: .75rem; color: var(--muted); font-size:.9rem; }
+    .sort { display:flex; gap:.5rem; align-items:center; }
+
+    @media (max-width: 1024px){ .results { grid-template-columns: repeat(2,minmax(0,1fr)); } .controls{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
+    @media (max-width: 640px){ .results { grid-template-columns: 1fr; } .controls{ grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<div style="padding: 1rem;">
+    <a href="{{ url_for('index') }}" 
+       style="background:#22d3ee; padding:0.75rem 1.25rem; border-radius:12px; 
+              color:#0f172a; font-weight:bold; text-decoration:none;">
+       ← Back to Home
+    </a>
+</div>
+<body>
+  <header>
+    <h1>RecycloAI – Verified Recycling Charities</h1>
+  </header>
+
+  <main>
+    <section aria-labelledby="filters-heading">
+      <h2 id="filters-heading" style="position:absolute;left:-9999px;">Filters</h2>
+      <div class="controls" role="region" aria-label="Filter and search">
+        <div class="control">
+          <label for="q">Search</label>
+          <input id="q" type="search" placeholder="Name, mission, keywords…" />
+        </div>
+        <div class="control">
+          <label for="country">Country</label>
+          <select id="country">
+            <option value="">Any</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="region">State/Region</label>
+          <input id="region" placeholder="e.g., CA, ON, NSW" />
+        </div>
+        <div class="control">
+          <label for="focus">Focus Area</label>
+          <select id="focus">
+            <option value="">Any</option>
+            <option>Plastic recycling</option>
+            <option>E-waste recycling</option>
+            <option>Textiles & fashion</option>
+            <option>Metal & glass</option>
+            <option>Community education</option>
+            <option>Ocean cleanup</option>
+            <option>Circular economy policy</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="ratingMin">Min. Rating</label>
+          <select id="ratingMin">
+            <option value="0">Any</option>
+            <option value="60">60+</option>
+            <option value="70">70+</option>
+            <option value="80">80+</option>
+            <option value="90">90+</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="verifier">Verified By</label>
+          <select id="verifier">
+            <option value="">Any</option>
+            <option>Charity Navigator</option>
+            <option>GuideStar / Candid</option>
+            <option>GiveWell (topic)</option>
+            <option>Local regulator</option>
+          </select>
+        </div>
+        <div class="control" style="grid-column: span 6; display:flex; gap:.5rem; justify-content:flex-end;">
+          <button id="clearBtn" class="btn-ghost" type="button">Clear</button>
+          <button id="applyBtn" class="btn-primary" type="button">Apply Filters</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="pills" id="activePills" aria-live="polite"></div>
+        <div class="sort">
+          <label for="sortBy">Sort</label>
+          <select id="sortBy">
+            <option value="rating-desc">Rating (high → low)</option>
+            <option value="rating-asc">Rating (low → high)</option>
+            <option value="name-asc">Name (A → Z)</option>
+            <option value="name-desc">Name (Z → A)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="results-heading">
+      <h2 id="results-heading" style="position:absolute;left:-9999px;">Results</h2>
+      <div id="results" class="results" role="list"></div>
+      <div id="empty" class="empty" hidden>No matches. Try widening your filters or clearing them.</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>💚 Built by RecycleAI • Verify before donating. When in doubt, donate via the charity's official site.</p>
+  </footer>
+
+  <script>
+    // --- Sample data. Move to /static/charities.json later and replace CHARITIES with fetched data. ---
+    const CHARITIES = [
+      {
+        id: 1,
+        name: "The Recycling Partnership",
+        country: "USA",
+        region: "VA",
+        focus: ["Community education", "Plastic recycling"],
+        rating: 92,
+        verified_by: ["Charity Navigator", "GuideStar / Candid"],
+        mission: "Helps communities improve residential recycling systems across the U.S.",
+        url: "https://recyclingpartnership.org",
+        donate_url: "https://recyclingpartnership.org/donate/",
+        accepts_crypto: false
+      },
+      {
+        id: 2,
+        name: "BAN – Basel Action Network",
+        country: "USA",
+        region: "WA",
+        focus: ["E-waste recycling", "Circular economy policy"],
+        rating: 90,
+        verified_by: ["GuideStar / Candid"],
+        mission: "Champions responsible e-waste recycling and fights global waste trafficking.",
+        url: "https://www.ban.org/",
+        donate_url: "https://www.ban.org/donate",
+        accepts_crypto: false
+      },
+      {
+        id: 3,
+        name: "Ocean Conservancy",
+        country: "USA",
+        region: "DC",
+        focus: ["Ocean cleanup", "Plastic recycling"],
+        rating: 89,
+        verified_by: ["Charity Navigator", "GuideStar / Candid"],
+        mission: "Works to protect the ocean from today's greatest global challenges.",
+        url: "https://oceanconservancy.org/",
+        donate_url: "https://oceanconservancy.org/donate/",
+        accepts_crypto: false
+      },
+      {
+        id: 4,
+        name: "TerraCycle Foundation",
+        country: "Global",
+        region: "",
+        focus: ["Plastic recycling", "Community education"],
+        rating: 80,
+        verified_by: ["Local regulator"],
+        mission: "Supports collection and recycling of hard-to-recycle waste in emerging markets.",
+        url: "https://www.terracyclefoundation.org/",
+        donate_url: "https://www.terracyclefoundation.org/donate",
+        accepts_crypto: false
+      },
+      {
+        id: 5,
+        name: "EWaste Connection",
+        country: "Canada",
+        region: "ON",
+        focus: ["E-waste recycling"],
+        rating: 83,
+        verified_by: ["Local regulator"],
+        mission: "Community-based electronics reuse and recycling programs in Ontario.",
+        url: "https://ewasteconnection.ca/",
+        donate_url: "https://ewasteconnection.ca/donate/",
+        accepts_crypto: false
+      }
+    ];
+
+    // --- Setup ---
+    const els = {
+      q: document.getElementById('q'),
+      country: document.getElementById('country'),
+      region: document.getElementById('region'),
+      focus: document.getElementById('focus'),
+      ratingMin: document.getElementById('ratingMin'),
+      verifier: document.getElementById('verifier'),
+      applyBtn: document.getElementById('applyBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      sortBy: document.getElementById('sortBy'),
+      results: document.getElementById('results'),
+      empty: document.getElementById('empty'),
+      activePills: document.getElementById('activePills'),
+      countrySelect: document.getElementById('country')
+    };
+
+    // Populate country options from data
+    const countries = Array.from(new Set(CHARITIES.map(c => c.country).filter(Boolean))).sort();
+    for (const c of countries){
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c; els.country.appendChild(opt);
+    }
+
+    // Utility: debounce
+    function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), ms); }; }
+
+    // Filtering logic
+    function currentFilters(){
+      return {
+        q: els.q.value.trim().toLowerCase(),
+        country: els.country.value,
+        region: els.region.value.trim().toLowerCase(),
+        focus: els.focus.value,
+        ratingMin: Number(els.ratingMin.value || 0),
+        verifier: els.verifier.value,
+        sortBy: els.sortBy.value
+      };
+    }
+
+    function applyFilters(){
+      const f = currentFilters();
+      let data = CHARITIES.filter(ch => {
+        if (f.q){
+          const hay = (ch.name + ' ' + ch.mission + ' ' + ch.focus.join(' ')).toLowerCase();
+          if (!hay.includes(f.q)) return false;
+        }
+        if (f.country && ch.country !== f.country) return false;
+        if (f.region && !(ch.region || '').toLowerCase().includes(f.region)) return false;
+        if (f.focus && !ch.focus.includes(f.focus)) return false;
+        if (ch.rating < f.ratingMin) return false;
+        if (f.verifier && !ch.verified_by.includes(f.verifier)) return false;
+        return true;
+      });
+
+      // Sorting
+      const [key, dir] = f.sortBy.split('-');
+      data.sort((a,b)=>{
+        if (key === 'rating') return dir === 'desc' ? b.rating - a.rating : a.rating - b.rating;
+        if (key === 'name') return dir === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        return 0;
+      });
+
+      renderPills(f);
+      renderResults(data);
+    }
+
+    function renderPills(f){
+      els.activePills.innerHTML = '';
+      const items = [];
+      if (f.q) items.push(['q', `Search: "${f.q}"`]);
+      if (f.country) items.push(['country', f.country]);
+      if (f.region) items.push(['region', f.region.toUpperCase()]);
+      if (f.focus) items.push(['focus', f.focus]);
+      if (f.ratingMin>0) items.push(['ratingMin', `Rating ≥ ${f.ratingMin}`]);
+      if (f.verifier) items.push(['verifier', f.verifier]);
+      for (const [key,label] of items){
+        const pill = document.createElement('button');
+        pill.className='pill';
+        pill.textContent = label + ' ✕';
+        pill.setAttribute('aria-label', 'Remove filter ' + label);
+        pill.addEventListener('click', ()=>{ if (key in els){ if(els[key].tagName==='SELECT'||els[key].tagName==='INPUT'){ els[key].value=''; } } applyFilters(); });
+        els.activePills.appendChild(pill);
+      }
+    }
+
+    function resultCard(ch){
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.setAttribute('role','listitem');
+      div.innerHTML = `
+        <h3>${ch.name}</h3>
+        <div class="meta">
+          <span class="rating">${ch.rating}/100</span>
+          <span>• ${ch.country}${ch.region ? ', ' + ch.region : ''}</span>
+          ${ch.verified_by.length ? `<span class="verified" title="Verified by ${ch.verified_by.join(', ')}">${checkIcon()} Verified</span>` : ''}
+        </div>
+        <div>${ch.focus.map(f=>`<span class="pill">${f}</span>`).join(' ')}</div>
+        <p style="margin:.25rem 0 .5rem; color:#cbd5e1;">${ch.mission}</p>
+        <div class="actions">
+          <a class="btn-ghost" href="${ch.url}" target="_blank" rel="noopener noreferrer">Website</a>
+          <a class="btn-primary" href="${ch.donate_url}" target="_blank" rel="noopener noreferrer">Donate</a>
+        </div>
+      `;
+      return div;
+    }
+
+    function renderResults(data){
+      els.results.innerHTML = '';
+      if (!data.length){ els.empty.hidden = false; return; }
+      els.empty.hidden = true;
+      for (const ch of data){ els.results.appendChild(resultCard(ch)); }
+    }
+
+    function checkIcon(){
+      return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20Z" stroke="#10b981" stroke-width="1.5"/><path d="M7 12l3 3 7-7" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
+
+    // Wire up events
+    els.applyBtn.addEventListener('click', applyFilters);
+    els.clearBtn.addEventListener('click', ()=>{
+      els.q.value=''; els.country.value=''; els.region.value=''; els.focus.value=''; els.ratingMin.value='0'; els.verifier.value=''; applyFilters();
+    });
+    els.q.addEventListener('input', debounce(applyFilters, 250));
+    els.country.addEventListener('change', applyFilters);
+    els.region.addEventListener('input', debounce(applyFilters, 250));
+    els.focus.addEventListener('change', applyFilters);
+    els.ratingMin.addEventListener('change', applyFilters);
+    els.verifier.addEventListener('change', applyFilters);
+    els.sortBy.addEventListener('change', applyFilters);
+
+    // Initial render
+    applyFilters();
+  </script>
+</body>
+</html>

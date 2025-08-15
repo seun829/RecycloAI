@@ -104,6 +104,10 @@ def prepare_image(img: Image.Image) -> torch.Tensor:
 def index():
     return render_template('home.html')
 
+@app.route("/charities")
+def charities():
+    return render_template("charities.html")
+
 
 @app.route('/process_image', methods=['POST'])
 def process_image():

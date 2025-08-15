@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RecycleAI – Recyclability Detector</title>
+    <title>RecycloAI – Recyclability Detector</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Link to the updated CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</header>
 </head>
 <body>
     <header>
-        <h1>RecycleAI – Is It Recyclable?</h1>
+        <h1>RecycloAI – Is It Recyclable?</h1>
     </header>
 
     <main>
@@ -23,10 +24,16 @@
                 <ul id="context-list"></ul>
             </div>
         </section>
+        <div style="text-align:center; margin-top:2rem;">
+            <a href="{{ url_for('charities') }}" 
+            style="background:#22d3ee; padding:1rem 1.5rem; border-radius:12px; color:#0f172a; font-weight:bold; text-decoration:none;">
+            🌍 Explore Various Verified Recycling Charities
+            </a>
+        </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 RecycleAI Project</p>
+        <p>&copy; 2025 RecycloAI Project</p>
     </footer>
 
     <!-- Link to the updated JavaScript file -->
