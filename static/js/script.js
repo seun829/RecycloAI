@@ -95,12 +95,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const esc = (s) =>
     String(s).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+  // NEW: prefer backend-provided confidence_text; fallback to formatted percent certain
+  function confidenceText(data) {
+    if (data?.confidence_text) return data.confidence_text;
+    const c = Number(data?.confidence);
+    if (!Number.isNaN(c)) {
+      const pct = c <= 1 ? c * 100 : c;
+      return `${pct.toFixed(1)} % Confidence Score`;
+    }
+    return "—";
+  }
+
   function renderResult(data) {
     const li = document.createElement("li");
-    const confPct = ((data.confidence ?? 0) * 100).toFixed(1);
     li.innerHTML = `
       <span class="result-label">${esc(data.label ?? "Unknown")}</span>
-      <span class="result-confidence">— ${esc(confPct)}%</span>
+      <span class="result-confidence"> - ${esc(confidenceText(data))}</span>
       ${data.tip ? `<span class="result-tip">Tip: ${esc(data.tip)}</span>` : ``}
     `;
     contextList.appendChild(li);

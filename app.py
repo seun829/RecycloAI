@@ -133,8 +133,7 @@ def process_image():
     pred_idx = int(np.argmax(probs))
     confidence = float(probs[pred_idx])
 
-    # Add near the top, after NUM_CLASSES_FALLBACK
-    CLASS_NAMES = ["Cardboard", "Glass", "Metal", "Paper", "Plastic", "Trash"]  # adjust order to your training
+    CLASS_NAMES = ["Cardboard", "Glass", "Metal", "Paper", "Plastic", "Trash"]  # adjust to your training order
     TIPS = {
         "Cardboard": "Flatten boxes and keep them dry; remove packing tape if you can.",
         "Glass": "Rinse and remove caps; most programs take bottles and jars only.",
@@ -144,17 +143,20 @@ def process_image():
         "Trash": "This item is not recyclable locally; consider reusing or proper disposal."
     }
 
-
-    # Map index -> human-readable label safely
-    if 0 <= pred_idx < len(CLASS_NAMES):
-        label = CLASS_NAMES[pred_idx]
-    else:
-        label = f"Class_{pred_idx}"  # fallback name if classes mismatch
-
+    label = CLASS_NAMES[pred_idx] if 0 <= pred_idx < len(CLASS_NAMES) else f"Class_{pred_idx}"
     tip = TIPS.get(label, "Check local recycling guidelines for your area.")
 
-    return jsonify({'label': label, 'confidence': confidence, 'tip': tip})
+    # New: preformatted confidence text for the UI
+    confidence_percent = confidence * 100
+    confidence_text = f"{confidence_percent:.1f} % Confidence Score"
 
+    return jsonify({
+        'label': label,
+        'confidence': confidence,            # keep raw (0–1) for any logic
+        'confidence_text': confidence_text,  # new display string
+        'tip': tip
+    })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
+

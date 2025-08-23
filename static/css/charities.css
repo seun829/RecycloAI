@@ -1,0 +1,166 @@
+/* --------------------------
+   RecycleAI - Charities / Listing (Dark Green)
+---------------------------*/
+
+/* Design tokens */
+:root {
+  /* Backgrounds */
+  --bg: #0a1a14;         /* very dark green-black */
+  --bg-2: #12241b;       /* deep forest green */
+
+  /* Surfaces */
+  --panel: rgba(18, 36, 27, 0.75);   /* dark frosted green glass */
+  --panel-solid: #15271f;            /* solid deep green */
+  --chip: #13251b;                   /* pill/list chip bg */
+
+  /* Lines & shadows */
+  --border: #1e3328;                 /* deep green-gray border */
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+
+  /* Text */
+  --text: #e5f7ee;                   /* light mint text */
+  --muted: #8aa897;                  /* muted sage */
+
+  /* Accents */
+  --accent: #34d399;                 /* emerald */
+  --accent-2: #10b981;               /* teal */
+  --success: #22c55e;                /* bright success */
+  --danger: #ef4444;                 /* error red */
+  --ink-on-accent: #07130f;          /* text on green gradient */
+}
+
+* { box-sizing: border-box; }
+
+/* Base */
+body {
+  margin: 0;
+  font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+  background: linear-gradient(180deg, var(--bg), var(--bg-2));
+  color: var(--text);
+}
+
+/* Utility: screen-reader-only */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* Top bar back button */
+.topbar { padding: 1rem; }
+.back-btn {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  color: var(--ink-on-accent);
+  font-weight: bold;
+  text-decoration: none;
+}
+.back-btn:hover { filter: brightness(1.05); }
+
+/* Header & footer */
+header, footer {
+  padding: 1rem 1.25rem;
+  background: var(--panel);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--border);
+}
+header h1 { margin: 0; font-size: 1.5rem; letter-spacing:.2px; }
+main { padding: 1.25rem; max-width: 1100px; margin: 0 auto; }
+footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  text-align: center;
+  font-size: .95rem;
+}
+
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+  gap: .75rem;
+  align-items: end;
+  background: var(--panel);
+  padding: 1rem;
+  border:1px solid var(--border);
+  border-radius: 16px;
+}
+.control { display: flex; flex-direction: column; gap: .35rem; }
+.control--full { grid-column: 1 / -1; }
+.actions-row { display:flex; gap:.5rem; justify-content:flex-end; }
+
+label { font-size: .85rem; color: var(--muted); }
+
+input, select {
+  padding: .6rem .7rem;
+  background: var(--panel-solid);
+  color: var(--text);
+  border:1px solid var(--border);
+  border-radius: 10px;
+}
+input::placeholder { color: var(--muted); }
+
+button {
+  cursor: pointer; border: none; border-radius: 12px;
+  padding: .75rem 1rem; font-weight: 600;
+}
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: var(--ink-on-accent);
+  box-shadow: var(--shadow);
+}
+.btn-ghost { background: transparent; color: var(--text); border:1px solid var(--border); }
+
+/* Pills */
+.pills { display:flex; gap:.5rem; flex-wrap: wrap; }
+.pill {
+  font-size: .75rem; padding: .25rem .5rem; border-radius: 999px;
+  border:1px solid var(--border); background: var(--chip); color:#cde7db;
+}
+
+/* Toolbar */
+.toolbar { margin-top: .75rem; display:flex; align-items:center; justify-content: space-between; gap: .75rem; color: var(--muted); font-size:.9rem; }
+.sort { display:flex; gap:.5rem; align-items:center; }
+
+/* Results */
+.results { margin-top: 1rem; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.card {
+  display:flex; flex-direction: column; gap:.5rem;
+  background: var(--panel);
+  border:1px solid var(--border); border-radius: 18px; padding: 1rem;
+  box-shadow: var(--shadow);
+}
+.card h3 { margin:0; font-size: 1.05rem; }
+.meta { display:flex; gap:.5rem; flex-wrap: wrap; align-items:center; font-size:.85rem; color:#cde7db; }
+.rating { font-weight:700; }
+.verified { display:inline-flex; align-items:center; gap:.35rem; font-size:.8rem; color: var(--success); }
+.verified svg { width: 14px; height: 14px; }
+.actions { margin-top: auto; display:flex; gap:.5rem; }
+.empty {
+  text-align:center; color: var(--muted); padding: 2rem;
+  border:1px dashed var(--border); border-radius: 16px;
+}
+
+/* Banner */
+.banner {
+  margin: .75rem 0 0;
+  padding: .75rem 1rem;
+  border:1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--muted);
+}
+.banner.error { color: var(--danger); border-color: var(--border); }
+
+/* Responsive */
+@media (max-width: 1024px){
+  .results { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .controls{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (max-width: 640px){
+  .results { grid-template-columns: 1fr; }
+  .controls{ grid-template-columns: 1fr 1fr; }
+}

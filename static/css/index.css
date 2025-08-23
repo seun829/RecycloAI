@@ -1,23 +1,26 @@
 /* --------------------------
-   RecycleAI - Detector UI
-   Dark, glassy style to match charities page
+   RecycleAI - Detector UI (Dark Green)
 ---------------------------*/
 
 /* Reset */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* Design tokens */
+/* Design tokens (match listing page) */
 :root{
-  --bg: #0b1220;           /* deep slate gradient start */
-  --bg-2: #0f172a;         /* deep slate gradient end */
-  --panel: rgba(17,24,39,.65); /* glass panel */
-  --panel-solid: #111827;  /* solid back layer */
-  --border: #1f2937;       /* card borders */
-  --text: #e5e7eb;         /* text on dark */
-  --muted: #9ca3af;        /* secondary text */
-  --accent: #22d3ee;       /* cyan */
-  --accent-2: #a78bfa;     /* violet */
-  --success: #34d399;      /* green for good states */
+  --bg: #0a1a14;              /* very dark green-black */
+  --bg-2: #12241b;            /* deep forest green */
+  --panel: rgba(18,36,27,.75); /* dark frosted green glass */
+  --panel-solid: #15271f;      /* solid deep green */
+  --chip: #13251b;             /* list item bg */
+  --border: #1e3328;           /* card borders */
+  --text: #e5f7ee;             /* text on dark */
+  --muted: #8aa897;            /* secondary text */
+  --accent: #34d399;           /* emerald */
+  --accent-2: #10b981;         /* teal */
+  --success: #22c55e;          /* green for good states */
+  --danger: #ef4444;           /* red for errors */
+  --ink-on-accent: #07130f;    /* text on green gradient */
+  --shadow: 0 8px 24px rgba(0,0,0,.35);
 }
 
 /* Base */
@@ -35,14 +38,14 @@ header{
   position: sticky;
   top: 0;
   z-index: 10;
-  background: linear-gradient(180deg, rgba(2,6,23,.85), rgba(2,6,23,.55));
+  background: linear-gradient(180deg, rgba(10,26,20,.85), rgba(10,26,20,.55));
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
   padding: 16px 20px;
 }
 header h1{ font-size: 1.35rem; letter-spacing: .2px; }
 
-/* Optional small nav (safe if present in HTML) */
+/* Optional small nav */
 header nav{ margin-top: 8px; display: flex; gap: .75rem; flex-wrap: wrap; }
 header nav a{
   color: var(--text);
@@ -52,7 +55,7 @@ header nav a{
   font-size: .9rem;
   padding: .35rem .7rem;
 }
-header nav a:hover{ border-color:#334155; }
+header nav a:hover{ border-color: var(--border); filter: brightness(1.05); }
 
 /* Main layout */
 main{
@@ -74,7 +77,7 @@ main{
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 18px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  box-shadow: var(--shadow);
 }
 
 /* Webcam container */
@@ -89,8 +92,8 @@ main{
   display: block;
   border-radius: 16px;
   border: 1px solid var(--border);
-  background: #0a0f1a;
-  aspect-ratio: 16/9;          /* keeps a nice shape if cam not ready */
+  background: var(--panel-solid);
+  aspect-ratio: 16/9;
   object-fit: cover;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
 }
@@ -106,8 +109,8 @@ main{
   font-weight: 700;
   cursor: pointer;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #0b1220;
-  box-shadow: 0 8px 18px rgba(34,211,238,.25), 0 2px 0 rgba(0,0,0,.25) inset;
+  color: var(--ink-on-accent);
+  box-shadow: 0 8px 18px rgba(16,185,129,.25), 0 2px 0 rgba(0,0,0,.25) inset;
   transition: transform .12s ease, filter .2s ease;
 }
 #analyze-button:hover{ transform: translateY(-1px); filter: brightness(1.05); }
@@ -122,7 +125,7 @@ main{
   display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.8rem;
 }
 
-/* Harmonized glass buttons for Open/Upload; matches dark theme */
+/* Harmonized glass buttons for Open/Upload */
 #start-camera, #upload-photo{
   appearance:none;
   padding:.75rem 1rem;
@@ -131,18 +134,14 @@ main{
   letter-spacing:.2px;
   border:1px solid var(--border);
   color:var(--text);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  box-shadow:
-    0 10px 20px rgba(0,0,0,.25),
-    inset 0 1px 0 rgba(255,255,255,.05);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  box-shadow: var(--shadow);
   cursor:pointer;
   transition:transform .12s ease, filter .2s ease, border-color .2s ease;
 }
 #start-camera:hover, #upload-photo:hover{
   transform: translateY(-1px);
   filter: brightness(1.06);
-  border-color:#334155;
 }
 #start-camera:active, #upload-photo:active{ transform: translateY(0); }
 #start-camera:focus, #upload-photo:focus{ outline:2px solid #94a3b8; outline-offset:3px; }
@@ -156,7 +155,7 @@ main{
 }
 #logs-container.panel{ padding: 18px; }
 #logs-container h2{
-  font-size: 1.15rem;        /* a little larger */
+  font-size: 1.15rem;
   color: var(--muted);
   margin-bottom: 10px;
   font-weight: 600;
@@ -172,17 +171,17 @@ main{
   flex-direction: column;
   gap: 10px;
   scrollbar-width: thin;
-  scrollbar-color: #334155 transparent;
+  scrollbar-color: var(--border) transparent;
 }
 #context-list li{
-  background: #0b1220;
+  background: var(--chip);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px 14px 14px 16px;
   line-height: 1.35;
-  color: #cbd5e1;
+  color: #cde7db;
   position: relative;
-  font-size: 1.1rem;         /* bigger results */
+  font-size: 1.1rem;
 }
 #context-list li::before{
   content: "";
@@ -197,22 +196,14 @@ main{
 }
 
 /* Styled spans inside results */
-.result-label{
-  font-weight:800; color:#e2e8f0;   /* brighter title */
-}
-.result-confidence{
-  font-weight:700; color:var(--success);
-  margin-left:.35rem;
-}
-.result-tip{
-  display:block; margin-top:.25rem;
-  font-size:.98rem; color:var(--muted);
-}
+.result-label{ font-weight:800; color:#e2f0e9; }
+.result-confidence{ font-weight:700; color:var(--success); margin-left:.35rem; }
+.result-tip{ display:block; margin-top:.25rem; font-size:.98rem; color:var(--muted); }
 
 /* Footer */
 footer{
   border-top: 1px solid var(--border);
-  background: rgba(2,6,23,.6);
+  background: rgba(10,26,20,.6);
   color: var(--muted);
   text-align: center;
   padding: 12px 16px;
@@ -246,14 +237,12 @@ header h1.brand{
   line-height:1;
   font-weight:900;
   letter-spacing:.2px;
-  /* fluid size for header */
   font-size: clamp(1.25rem, 1rem + 2vw, 2.15rem);
 }
 
 .brand-prim{
   position:relative;
   display:inline-block;
-  /* glassy gradient text */
   background:
     radial-gradient(120% 180% at 10% 0%, rgba(255,255,255,.18) 0%, transparent 55%),
     linear-gradient(90deg, var(--accent), var(--accent-2));
@@ -261,10 +250,9 @@ header h1.brand{
   background-clip:text;
   -webkit-text-fill-color:transparent;
   text-shadow:
-    0 0 0.5px rgba(255,255,255,.4),         /* subtle edge */
-    0 8px 24px rgba(167,139,250,.18),       /* violet glow */
-    0 4px 14px rgba(34,211,238,.18);        /* cyan glow */
-  /* gentle shimmer */
+    0 0 0.5px rgba(255,255,255,.4),
+    0 8px 24px rgba(16,185,129,.18),
+    0 4px 14px rgba(52,211,153,.18);
   background-size: 200% 100%, 200% 100%;
   animation: brandShine 6s linear infinite;
 }
@@ -278,16 +266,16 @@ header h1.brand{
   align-items:center;
   justify-content:center;
   font-weight:800;
-  font-size:.72em;                /* slightly smaller than text */
+  font-size:.72em;
   text-transform: uppercase;
   letter-spacing:.8px;
   padding:.28em .6em .3em;
   border-radius:999px;
-  color:#0b1220;
+  color: var(--ink-on-accent);
   border:1px solid var(--border);
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   box-shadow:
-    0 10px 22px rgba(167,139,250,.25),
+    0 10px 22px rgba(16,185,129,.25),
     0 2px 0 rgba(255,255,255,.18) inset;
   position:relative;
   overflow:hidden;
@@ -307,18 +295,14 @@ header h1.brand{
 
 .brand-leaf{
   width: 1.15em; height: 1.15em;
-  filter: drop-shadow(0 6px 14px rgba(34,211,238,.25))
-          drop-shadow(0 6px 14px rgba(167,139,250,.2));
+  filter: drop-shadow(0 6px 14px rgba(16,185,129,.25))
+          drop-shadow(0 6px 14px rgba(52,211,153,.2));
   transform: translateY(1px);
 }
-
-/* hover micro-interaction */
 header h1.brand:hover .brand-leaf{
   transform: translateY(-1px) rotate(-2deg);
   transition: transform .18s ease;
 }
-
-/* respect reduced motion */
 @media (prefers-reduced-motion: reduce){
   .brand-prim, .brand-ai::after { animation: none !important; }
   header h1.brand:hover .brand-leaf{ transform: none !important; }
