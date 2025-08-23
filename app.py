@@ -14,9 +14,8 @@ from torchvision import models
 app = Flask(__name__)
 
 STATE_PATH = "best_efficientnet_model.pth"
-# If num_classes can't be inferred from the state dict, we'll fall back to this.
-# Set this to your dataset's class count if needed.
-NUM_CLASSES_FALLBACK = 6  # <-- change if your dataset has a different number of classes
+
+NUM_CLASSES_FALLBACK = 6
 
 
 # -------- helpers (typed + robust) --------
@@ -51,7 +50,6 @@ def get_in_features(classifier: nn.Module) -> int:
 
     # Safe fallback for EfficientNet-B0
     return 1280
-# -----------------------------------------
 
 
 # -------- build model + load weights --------
@@ -75,7 +73,6 @@ _missing, _unexpected = _model.load_state_dict(_state, strict=False)
 
 _model.eval()
 model = _model.to(device)
-# -------------------------------------------
 
 
 # -------- preprocessing (matches training) --------
@@ -97,7 +94,6 @@ def prepare_image(img: Image.Image) -> torch.Tensor:
     # to torch tensor with batch dimension
     x = torch.from_numpy(arr).unsqueeze(0)  # [1, 3, 224, 224]
     return x.to(device)
-# --------------------------------------------------
 
 
 @app.route('/')
@@ -137,11 +133,27 @@ def process_image():
     pred_idx = int(np.argmax(probs))
     confidence = float(probs[pred_idx])
 
-    # For minimal changes, return the class index as label.
-    # If you have classes.txt (one class per line), you can map pred_idx -> name.
-    label = str(pred_idx)
+    # Add near the top, after NUM_CLASSES_FALLBACK
+    CLASS_NAMES = ["Cardboard", "Glass", "Metal", "Paper", "Plastic", "Trash"]  # adjust order to your training
+    TIPS = {
+        "Cardboard": "Flatten boxes and keep them dry; remove packing tape if you can.",
+        "Glass": "Rinse and remove caps; most programs take bottles and jars only.",
+        "Metal": "Rinse cans; crushing is optional but saves space.",
+        "Paper": "Keep it clean and dry; no greasy pizza boxes.",
+        "Plastic": "Check local rules; #1 and #2 bottles are most widely accepted.",
+        "Trash": "This item is not recyclable locally; consider reusing or proper disposal."
+    }
 
-    return jsonify({'label': label, 'confidence': confidence})
+
+    # Map index -> human-readable label safely
+    if 0 <= pred_idx < len(CLASS_NAMES):
+        label = CLASS_NAMES[pred_idx]
+    else:
+        label = f"Class_{pred_idx}"  # fallback name if classes mismatch
+
+    tip = TIPS.get(label, "Check local recycling guidelines for your area.")
+
+    return jsonify({'label': label, 'confidence': confidence, 'tip': tip})
 
 
 if __name__ == '__main__':

@@ -1,51 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>RecycloAI – Recyclability Detector</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Link to the updated CSS file -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-</header>
+  <meta charset="UTF-8" />
+  <title>RecycloAI – Recyclability Detector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
 </head>
 <body>
-    <header>
-        <h1>RecycloAI – Is It Recyclable?</h1>
-    </header>
+  <header>
+    <h1 class="brand" aria-label="RecycloAI">
+        <span class="brand-prim">Recyclo</span>
+        <svg class="brand-leaf" aria-hidden="true" viewBox="0 0 36 36" width="28" height="28">
+            <defs>
+            <linearGradient id="gradBrand" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop offset="0"  stop-color="#22d3ee"/>
+                <stop offset="1"  stop-color="#a78bfa"/>
+            </linearGradient>
+            <filter id="leafGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="1.8" result="blur"/>
+                <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            </defs>
+            <!-- stylized leaf/sprout -->
+            <path fill="url(#gradBrand)" filter="url(#leafGlow)"
+                d="M30 6c-12 2-20 10-24 22 7-4 15-6 22-12-2 4-5 7-9 10 7 0 12-5 12-12 0-3-.4-5-.8-8Z"/>
+        </svg>
+        <span class="brand-ai" aria-hidden="true">AI</span>
+    </h1>
 
-    <main>
-        <section id="classification-section">
-            <div id="webcam-container">
-                <video id="camera-feed" autoplay muted playsinline></video>
-                <button id="analyze-button">Analyze Item</button>
-            </div>
-            <div id="logs-container">
-                <h2>Classification Results</h2>
-                <ul id="context-list"></ul>
-            </div>
-        </section>
-        <div style="text-align:center; margin-top:2rem;">
-            <a href="{{ url_for('charities') }}" 
-            style="background:#22d3ee; padding:1rem 1.5rem; border-radius:12px; color:#0f172a; font-weight:bold; text-decoration:none;">
-            🌍 Explore Various Verified Recycling Charities
-            </a>
+  </header>
+
+  <main>
+    <section id="classification-section">
+      <div id="webcam-container" class="panel">
+        <video id="camera-feed" autoplay muted playsinline></video>
+
+        <div class="controls">
+          <button id="start-camera" type="button">Open Camera</button>
+          <button id="analyze-button" type="button" disabled>Analyze Item</button>
+          <button id="upload-photo" type="button">Upload Photo</button>
+          <input id="photo-input" type="file" accept="image/*" capture="environment" hidden />
         </div>
-    </main>
+      </div>
 
-    <footer>
-        <p>&copy; 2025 RecycloAI Project</p>
-    </footer>
+      <div id="logs-container" class="panel">
+        <h2>Classification Results</h2>
+        <ul id="context-list"></ul>
+      </div>
+    </section>
 
-    <!-- Link to the updated JavaScript file -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        // Automatically trigger analysis every 10 seconds
-        setInterval(() => {
-            const analyzeButton = document.getElementById('analyze-button');
-            if (analyzeButton) {
-                analyzeButton.click();
-            }
-        }, 10000);
-    </script>
+    <div style="text-align:center; margin-top:2rem;">
+      <a href="{{ url_for('charities') }}"
+         style="background:#22d3ee; padding:1rem 1.5rem; border-radius:12px; color:#0f172a; font-weight:bold; text-decoration:none;">
+        🌍 Explore Verified Recycling Charities
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 RecycloAI Project</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
