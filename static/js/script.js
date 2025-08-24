@@ -7,13 +7,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const photoInput = document.getElementById("photo-input");
   const contextList = document.getElementById("context-list");
 
+  // Optional inputs (add these to your HTML if you want):
+  // <input id="city-input" placeholder="City (e.g., Austin, TX)">
+  // <label><input id="attr-food_soiled" type="checkbox"> Food-soiled</label>
+  // <label><input id="attr-film" type="checkbox"> Film plastic</label>
+  // <label><input id="attr-rigid" type="checkbox" checked> Rigid plastic</label>
+  // <label><input id="attr-black" type="checkbox"> Black plastic</label>
+  // <label><input id="attr-wet" type="checkbox"> Wet</label>
+  // <label><input id="attr-lined" type="checkbox"> Lined (e.g., paper cup)</label>
+  // <label><input id="attr-foam" type="checkbox"> Foam / EPS</label>
+  // <label><input id="attr-hazard" type="checkbox"> Hazard</label>
+  const cityInput = document.getElementById("city-input");
+  const attrIds = [
+    "soft_bag",
+    "foam",
+    "paper_cup_or_carton",
+    "greasy_or_wet",
+    // "hazard" is optional to send; include if you want:
+    "hazard"
+  ];
+
+  const attrEls = Object.fromEntries(attrIds.map(id => [id, document.getElementById(`attr-${id}`)]));
+
   // avoid duplicate bindings
-  if (analyzeBtn.dataset.bound === "true") return;
+  if (!analyzeBtn || analyzeBtn.dataset.bound === "true") return;
   analyzeBtn.dataset.bound = "true";
 
   let stream = null;
   let inFlight = false;
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  function collectContext() {
+    // city is case-insensitive; backend normalizes
+    const city = cityInput?.value?.trim() || "default";
+    const attrs = {};
+    for (const [k, el] of Object.entries(attrEls)) {
+      if (el && typeof el.checked === "boolean") attrs[k] = !!el.checked;
+    }
+    return { city, attrs };
+  }
 
   async function startCamera() {
     const base = { width: { ideal: 1280 }, height: { ideal: 720 }, aspectRatio: { ideal: 16 / 9 } };
@@ -47,14 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("beforeunload", () => stream?.getTracks().forEach(t => t.stop()));
   }
 
-  startBtn.addEventListener("click", async () => {
+  startBtn?.addEventListener("click", async () => {
     try {
-      // HTTPS required on mobile (localhost is OK)
-      await startCamera();
+      await startCamera(); // HTTPS required on mobile (localhost is OK)
     } catch (e) {
       console.error("Camera error:", e);
       alert("Couldn’t open the camera. You can upload a photo instead.");
-      uploadBtn.focus();
+      uploadBtn?.focus();
     }
   });
 
@@ -82,20 +113,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return canvas;
   }
 
-  async function sendCanvas(canvas) {
-    const imageData = canvas.toDataURL("image/jpeg");
+  async function sendImagePayload(imageData) {
+    const { city, attrs } = collectContext();
     const res = await fetch("/process_image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image_data: imageData })
+      body: JSON.stringify({ image_data: imageData, city, attrs })
     });
     return res.json();
   }
 
-  const esc = (s) =>
-    String(s).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  async function sendCanvas(canvas) {
+    const imageData = canvas.toDataURL("image/jpeg");
+    return sendImagePayload(imageData);
+  }
 
-  // NEW: prefer backend-provided confidence_text; fallback to formatted percent certain
+  const esc = (s) =>
+    String(s ?? "").replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+  // Prefer backend-provided confidence_text; fallback to formatted percent
   function confidenceText(data) {
     if (data?.confidence_text) return data.confidence_text;
     const c = Number(data?.confidence);
@@ -107,54 +143,85 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderResult(data) {
+    // Support both old (label) and new (material/action) API fields
+    const material = data.material ?? data.label ?? "Unknown";
+    const action = data.action ?? "Unknown";
+    const why = data.why ?? "";
+    const tip = data.tip ?? "";
+    const abstained = !!data.abstained;
+
     const li = document.createElement("li");
+    li.className = `result-item ${abstained ? "result-item--abstained" : ""}`;
     li.innerHTML = `
-      <span class="result-label">${esc(data.label ?? "Unknown")}</span>
-      <span class="result-confidence"> - ${esc(confidenceText(data))}</span>
-      ${data.tip ? `<span class="result-tip">Tip: ${esc(data.tip)}</span>` : ``}
+      <div class="result-primary">
+        <strong class="result-action">${esc(action)}</strong>
+        <span class="dot">•</span>
+        <span class="result-material">${esc(material)}</span>
+      </div>
+      <div class="result-meta">
+        <span class="result-confidence">${esc(confidenceText(data))}</span>
+      </div>
+      ${why ? `<div class="result-why">${esc(why)}</div>` : ``}
+      ${tip ? `<div class="result-tip">Tip: ${esc(tip)}</div>` : ``}
     `;
-    contextList.appendChild(li);
+    contextList?.appendChild(li);
   }
 
+  async function analyzeFromCamera() {
+    if (!stream) { photoInput?.click(); return; }
+    if (video.readyState < 2) {
+      await new Promise(r => video.addEventListener("loadeddata", r, { once: true }));
+    }
+    const canvas = grabFrameCanvas();
+    return sendCanvas(canvas);
+  }
+
+  // Button wire-up
   analyzeBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     if (inFlight) return;
     inFlight = true;
+    const prev = analyzeBtn.textContent;
+    analyzeBtn.textContent = "Analyzing…";
+    analyzeBtn.disabled = true;
+
     try {
-      if (!stream) { photoInput.click(); return; }
-      if (video.readyState < 2) {
-        await new Promise(r => video.addEventListener("loadeddata", r, { once: true }));
+      const data = await analyzeFromCamera();
+      if (data?.error) {
+        console.error(data.error);
+        alert("Error: " + data.error);
+      } else {
+        renderResult(data);
       }
-      const canvas = grabFrameCanvas();
-      const data = await sendCanvas(canvas);
-      if (data?.error) { console.error(data.error); return; }
-      renderResult(data);
     } catch (err) {
       console.error("Analyze error:", err);
+      alert("Couldn’t analyze the image.");
     } finally {
       inFlight = false;
+      analyzeBtn.textContent = prev;
+      analyzeBtn.disabled = false;
     }
   });
 
-  // upload fallback
-  uploadBtn.addEventListener("click", () => photoInput.click());
-  photoInput.addEventListener("change", async (e) => {
+  // Upload fallback
+  uploadBtn?.addEventListener("click", () => photoInput?.click());
+  photoInput?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const res = await fetch("/process_image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image_data: reader.result })
-        });
-        const data = await res.json();
-        if (data?.error) { console.error(data.error); return; }
-        renderResult(data);
+        const data = await sendImagePayload(reader.result);
+        if (data?.error) {
+          console.error(data.error);
+          alert("Error: " + data.error);
+        } else {
+          renderResult(data);
+        }
       } catch (err) {
         console.error("Upload processing error:", err);
+        alert("Couldn’t process the uploaded photo.");
       } finally {
         photoInput.value = ""; // allow same file later
       }

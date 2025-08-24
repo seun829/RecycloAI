@@ -24,13 +24,11 @@
                 </feMerge>
             </filter>
             </defs>
-            <!-- stylized leaf/sprout -->
             <path fill="url(#gradBrand)" filter="url(#leafGlow)"
                 d="M30 6c-12 2-20 10-24 22 7-4 15-6 22-12-2 4-5 7-9 10 7 0 12-5 12-12 0-3-.4-5-.8-8Z"/>
         </svg>
         <span class="brand-ai" aria-hidden="true">AI</span>
     </h1>
-
   </header>
 
   <main>
@@ -44,6 +42,45 @@
           <button id="upload-photo" type="button">Upload Photo</button>
           <input id="photo-input" type="file" accept="image/*" capture="environment" hidden />
         </div>
+      </div>
+
+      <!-- NEW: Context panel -->
+      <div id="context-container" class="panel">
+        <h2>Context</h2>
+
+        <!-- City selector -->
+        <select id="city-input">
+          <option value="default">Use Default Rules</option>
+          <option value="Austin, TX">Austin</option>
+          <option value="San Francisco, CA">San Francisco</option>
+          <option value="Seattle, WA">Seattle</option>
+          <option value="Portland, OR">Portland</option>
+          <option value="San Jose, CA">San Jose</option>
+          <option value="Denver, CO">Denver</option>
+
+          <option value="New York, NY">New York</option>
+          <option value="Los Angeles, CA">Los Angeles</option>
+          <option value="Chicago, IL">Chicago</option>
+          <option value="Boston, MA">Boston</option>
+          <option value="Philadelphia, PA">Philadelphia</option>
+          <option value="Houston, TX">Houston</option>
+          <option value="Miami, FL">Miami</option>
+          <option value="Phoenix, AZ">Phoenix</option>
+          <option value="Washington, DC">Washington, DC</option>
+          <option value="Atlanta, GA">Atlanta</option>
+          <option value="Minneapolis, MN">Minneapolis</option>
+        </select>
+
+
+        <!-- Attribute checkboxes (plain language) -->
+        <div class="attrs">
+          <label><input id="attr-soft_bag" type="checkbox"> Soft bag / plastic wrap</label>
+          <label><input id="attr-foam" type="checkbox"> Foam / Styrofoam</label>
+          <label><input id="attr-paper_cup_or_carton" type="checkbox"> Paper cup or carton</label>
+          <label><input id="attr-greasy_or_wet" type="checkbox"> Greasy / wet</label>
+          <label><input id="attr-hazard" type="checkbox"> Battery / chemicals (use special drop-off)</label>
+        </div>
+
       </div>
 
       <div id="logs-container" class="panel">

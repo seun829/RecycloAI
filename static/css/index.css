@@ -307,3 +307,95 @@ header h1.brand:hover .brand-leaf{
   .brand-prim, .brand-ai::after { animation: none !important; }
   header h1.brand:hover .brand-leaf{ transform: none !important; }
 }
+/* === Context Panel (Dark Emerald Glassy) === */
+#context-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 28, 20, 0.85) 0%,
+    rgba(10, 34, 24, 0.7) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(34, 197, 94, 0.18); /* emerald border */
+  box-shadow: inset 0 1px 0 rgba(236, 253, 245, 0.06),
+              0 10px 24px rgba(6, 20, 14, 0.45);
+  color: #e6fff4;
+}
+
+#context-container h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+  color: #86efac; /* emerald-300 */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+#context-container .field {
+  margin-bottom: 0.85rem;
+}
+
+#context-container label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  color: #c7f9d4; /* pale green */
+}
+
+/* === City dropdown === */
+#city-input {
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  background-color: rgba(15, 40, 28, 0.9); /* solid dark base */
+  color: #e6fff4; /* bright text */
+  font-weight: 500;
+  font-size: 0.95rem;
+  appearance: none;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+#city-input option {
+  background-color: #0f1e18;
+  color: #e6fff4;
+}
+
+#city-input:focus {
+  border-color: rgba(52, 211, 153, 0.8);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+/* === Attributes list === */
+#context-container .attrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+}
+
+#context-container .attrs label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #d6ffe9;
+  padding: 0.35rem 0.55rem;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(6, 35, 25, 0.75), rgba(6, 35, 25, 0.6));
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  transition: transform 120ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+#context-container .attrs input[type="checkbox"] {
+  accent-color: #34d399; /* emerald */
+  width: 16px;
+  height: 16px;
+}
+
+#context-container .attrs label:hover {
+  transform: translateY(-1px);
+  border-color: rgba(52, 211, 153, 0.5);
+  background: linear-gradient(180deg, rgba(8, 44, 31, 0.85), rgba(8, 44, 31, 0.68));
+}
+
