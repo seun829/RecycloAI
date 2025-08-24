@@ -22,7 +22,7 @@
     "verified_by": ["GuideStar / Candid"],
     "mission": "Champions responsible e-waste recycling and fights global waste trafficking.",
     "url": "https://www.ban.org/",
-    "donate_url": "https://www.ban.org/donate",
+    "donate_url": "https://www.ban.org/give",
     "accepts_crypto": false
   },
   {
@@ -48,7 +48,7 @@
     "verified_by": ["Local regulator"],
     "mission": "Supports collection and recycling of hard-to-recycle waste in emerging markets.",
     "url": "https://www.terracyclefoundation.org/",
-    "donate_url": "https://www.terracyclefoundation.org/donate",
+    "donate_url": "https://www.terracyclefoundation.org/pages/donate",
     "accepts_crypto": false
   },
   {
@@ -60,8 +60,8 @@
     "rating": 83,
     "verified_by": ["Local regulator"],
     "mission": "Community-based electronics reuse and recycling programs in Ontario.",
-    "url": "https://ewasteconnection.ca/",
-    "donate_url": "https://ewasteconnection.ca/donate/",
+    "url": "https://ewasteconnection.com/",
+    "donate_url": "https://ewasteconnection.com/donate/",
     "accepts_crypto": false
   },
   {
@@ -165,7 +165,7 @@
     "verified_by": ["GuideStar / Candid", "Local regulator"],
     "mission": "Transforms e-waste into opportunities through reuse, education, and workforce development.",
     "url": "https://www.freegeek.org/",
-    "donate_url": "https://www.freegeek.org/donate",
+    "donate_url": "https://give.freegeek.org/",
     "accepts_crypto": false
   },
   {
@@ -191,7 +191,7 @@
     "verified_by": ["Charity Navigator", "GuideStar / Candid"],
     "mission": "Turns unwanted shoes and clothing into opportunity by keeping them from going to waste.",
     "url": "https://soles4souls.org/",
-    "donate_url": "https://soles4souls.org/donate/",
+    "donate_url": "https://soles4souls.org/?form=give",
     "accepts_crypto": false
   },
   {
