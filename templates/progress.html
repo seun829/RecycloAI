@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RecycloAI – Progress & Logs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
+    .kpi{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+    .kpi h3{font-size:.9rem;color:var(--muted);margin:0 0 .35rem}
+    .kpi .num{font-weight:900;font-size:1.6rem;letter-spacing:.2px}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .chart-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+    .chart-card h3{font-size:1rem;color:var(--muted);margin:0 0 .5rem}
+    .tools{display:flex;gap:.5rem;justify-content:flex-end;margin:10px 0}
+    .log-table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .log-table th{color:var(--muted);font-weight:700;text-align:left;font-size:.9rem;padding:0 8px}
+    .log-table td{padding:10px 8px;background:var(--chip);border:1px solid var(--border)}
+    .log-table tr td:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}
+    .log-table tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
+    .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--border);background:var(--chip);font-weight:700}
+    .badge--recycle{border-color:rgba(52,211,153,.5)}
+    .badge--compost{border-color:rgba(34,197,94,.5)}
+    .badge--landfill{border-color:rgba(239,68,68,.45)}
+    @media (max-width: 900px){ .charts{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+    header nav{margin-top:8px;display:flex;gap:.75rem;flex-wrap:wrap}
+    header nav a{color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:999px;font-size:.9rem;padding:.35rem .7rem}
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="brand" aria-label="RecycloAI">
+      <span class="brand-prim">Recyclo</span>
+      <svg class="brand-leaf" aria-hidden="true" viewBox="0 0 36 36" width="28" height="28">
+        <defs>
+          <linearGradient id="gradBrand" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+          </linearGradient>
+          <filter id="leafGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path fill="url(#gradBrand)" filter="url(#leafGlow)" d="M30 6c-12 2-20 10-24 22 7-4 15-6 22-12-2 4-5 7-9 10 7 0 12-5 12-12 0-3-.4-5-.8-8Z"/>
+      </svg>
+      <span class="brand-ai" aria-hidden="true">AI</span>
+    </h1>
+
+    <nav>
+      <a href="{{ url_for('index') }}">Detector</a>
+      <a href="{{ url_for('charities') }}">Charities</a>
+      <a href="{{ url_for('progress') }}">Progress</a>
+    </nav>
+
+    <form action="{{ url_for('api_logout') }}" method="post" style="margin:0">
+      <button class="login-btn" type="submit"><span>Logout</span></button>
+    </form>
+  </header>
+
+  <main>
+    <section class="panel" style="padding:14px">
+      <div class="kpis">
+        <div class="kpi"><h3>Total Scans</h3><div id="kpi-total" class="num">0</div></div>
+        <div class="kpi"><h3>Recyclable</h3><div id="kpi-recycle" class="num">0</div></div>
+        <div class="kpi"><h3>Compost</h3><div id="kpi-compost" class="num">0</div></div>
+        <div class="kpi"><h3>Landfill</h3><div id="kpi-landfill" class="num">0</div></div>
+      </div>
+
+      <div class="charts">
+        <div class="chart-card">
+          <h3>Overall Distribution</h3>
+          <canvas id="donutChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Daily Trend (last 14 days)</h3>
+          <canvas id="barChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <div class="tools">
+        <button id="exportCsv" class="btn-ghost" type="button">Export CSV</button>
+        <button id="clearLogs" class="btn-primary" type="button">Clear Logs</button>
+      </div>
+
+      <div class="chart-card" style="margin-top:12px">
+        <h3>Recent Logs</h3>
+        <table class="log-table" aria-label="Recent classification logs">
+          <thead><tr><th>When</th><th>Label</th><th>Confidence</th><th>City/Context</th></tr></thead>
+          <tbody id="logRows"></tbody>
+        </table>
+        <p class="subtle" id="emptyMsg" hidden>No logs yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer><p>&copy; 2025 RecycloAI</p></footer>
+  <script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+</body>
+</html>

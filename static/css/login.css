@@ -1,0 +1,243 @@
+/* ================================
+   RecycloAI — Glassy Forest Theme
+   ================================ */
+
+/* Design tokens */
+:root{
+  /* Background */
+  --bg: #061a14;          /* deep evergreen */
+  --bg-2: #0b261d;        /* forest shadow */
+  --bg-3: #0d2f24;        /* canopy tint */
+
+  /* Glass surfaces */
+  --surface: rgba(9,24,19,.55);
+  --surface-strong: rgba(9,24,19,.75);
+  --border: rgba(255,255,255,.12);
+
+  /* Text */
+  --text: #e6f5ee;
+  --muted: #a8c7b9;
+
+  /* Accents (eco glow) */
+  --accent: #34d399;      /* emerald */
+  --accent-2: #10b981;    /* teal-emerald */
+  --ink-on-accent: #052019;
+
+  /* States */
+  --danger: #ef4444;
+  --shadow: 0 18px 60px rgba(0,0,0,.45);
+}
+
+/* Base & layout */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--text);
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  background:
+    radial-gradient(60% 100% at 10% 10%, rgba(52,211,153,.18) 0%, transparent 45%),
+    radial-gradient(60% 120% at 90% 20%, rgba(16,185,129,.14) 0%, transparent 48%),
+    linear-gradient(180deg, var(--bg), var(--bg-2) 60%, var(--bg-3) 100%);
+}
+
+/* Subtle vignette & grain */
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none;
+  background:
+    radial-gradient(120% 140% at 50% -10%, rgba(255,255,255,.08) 0%, transparent 60%),
+    radial-gradient(100% 120% at 50% 110%, rgba(0,0,0,.35) 0%, transparent 65%);
+  mix-blend-mode: soft-light;
+}
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 2px, transparent 2px 4px);
+}
+
+/* Animated background leaves (parallax-safe) */
+.bg-animation{position:absolute;width:100%;height:100%;pointer-events:none}
+.leaf{
+  position:absolute; border-radius:50% 0;
+  background: linear-gradient(135deg, rgba(52,211,153,.16), rgba(16,185,129,.06));
+  box-shadow: 0 8px 22px rgba(16,185,129,.12);
+  --tx:0px; --ty:0px;
+  animation: float 6s ease-in-out infinite;
+}
+.leaf:nth-child(1){width:64px;height:64px;top:12%;left:10%}
+.leaf:nth-child(2){width:44px;height:44px;top:68%;right:18%;animation-delay:1.3s}
+.leaf:nth-child(3){width:86px;height:86px;bottom:18%;left:16%;animation-delay:2.3s}
+
+@keyframes float{
+  0%,100%{ transform: translate(var(--tx), var(--ty)) rotate(0) }
+  50%    { transform: translate(var(--tx), calc(var(--ty) - 18px)) rotate(10deg) }
+}
+
+/* Auth card (frosted glass) */
+.login-container{
+  width:100%; max-width:460px; padding:44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  position:relative; z-index:1;
+  animation: slideUp .7s ease-out;
+  color: var(--text);
+}
+@supports (backdrop-filter: blur(8px)){
+  .login-container{ backdrop-filter: blur(18px) saturate(115%); }
+}
+@keyframes slideUp{ from{opacity:0; transform:translateY(36px)} to{opacity:1; transform:translateY(0)} }
+
+/* Branding (wordmark) */
+.logo-container{ text-align:center; margin-bottom:28px }
+.logo-container .brand{ margin-bottom:10px; }
+
+/* Wordmark styles (match new theme accents) */
+.brand{
+  display:inline-flex; align-items:center; gap:.55rem; line-height:1;
+  font-weight:900; letter-spacing:.2px;
+  font-size: clamp(1.35rem, 1rem + 2vw, 2.2rem);
+}
+.brand-prim{
+  position:relative; display:inline-block;
+  background:
+    radial-gradient(120% 180% at 10% 0%, rgba(255,255,255,.18) 0%, transparent 55%),
+    linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  text-shadow:
+    0 0 .5px rgba(255,255,255,.35),
+    0 10px 24px rgba(16,185,129,.18),
+    0 4px 14px rgba(52,211,153,.18);
+  background-size:200% 100%, 200% 100%;
+  animation: brandShine 6s linear infinite;
+}
+@keyframes brandShine{
+  0%{background-position:0% 0%, 0% 0%}
+  100%{background-position:200% 0%, 200% 0%}
+}
+.brand-ai{
+  display:inline-flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:.72em; text-transform:uppercase; letter-spacing:.8px;
+  padding:.28em .6em .3em; border-radius:999px;
+  color:var(--ink-on-accent); border:1px solid var(--border);
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 12px 26px rgba(16,185,129,.25), 0 2px 0 rgba(255,255,255,.1) inset;
+  position:relative; overflow:hidden;
+}
+.brand-ai::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.22), transparent);
+  transform: translateX(-120%) skewX(-18deg);
+  animation: pillSweep 2.6s ease-in-out infinite .2s;
+}
+@keyframes pillSweep{
+  50%{transform: translateX(10%) skewX(-18deg)}
+  100%{transform: translateX(120%) skewX(-18deg)}
+}
+.brand-leaf{
+  width:1.15em;height:1.15em;
+  filter: drop-shadow(0 6px 14px rgba(16,185,129,.25)) drop-shadow(0 6px 14px rgba(52,211,153,.2));
+  transform: translateY(1px);
+}
+.brand:hover .brand-leaf{ transform: translateY(-1px) rotate(-2deg); transition: transform .18s ease; }
+
+/* Tagline */
+.app-tagline{ color: var(--muted); font-size:14px }
+
+/* Form */
+.login-form{ margin-top:26px }
+.form-group{ margin-bottom:20px; position:relative }
+.form-label{ display:block; margin-bottom:8px; color: var(--muted); font-weight:600; font-size:13.5px }
+
+.form-input{
+  width:100%; padding:16px 16px 16px 18px;
+  background: rgba(255,255,255,.045);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px; outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease, background .2s ease;
+}
+.form-input::placeholder{ color: rgba(230,245,238,.6) }
+.form-input:focus{
+  border-color: rgba(52,211,153,.65);
+  box-shadow: 0 0 0 4px rgba(16,185,129,.18);
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.06);
+}
+
+/* Options & links */
+.form-options{ display:flex; justify-content:space-between; align-items:center; margin:18px 0 22px; font-size:14px }
+.remember-me{ display:flex; align-items:center; color: var(--muted) }
+.remember-me input{ margin-right:8px; accent-color: var(--accent-2) }
+.forgot-password{ color: var(--accent); text-decoration:none; font-weight:600 }
+.forgot-password:hover{ color: var(--accent-2) }
+
+/* Primary button */
+.login-btn{
+  width:100%; padding:15px 16px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color:#03241b; border:none; border-radius:14px;
+  font-size:16px; font-weight:800; cursor:pointer;
+  box-shadow: 0 14px 28px rgba(16,185,129,.25), 0 2px 0 rgba(0,0,0,.25) inset;
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+}
+.login-btn:hover{ transform: translateY(-1px); filter: brightness(1.05) }
+.login-btn:active{ transform: translateY(0) }
+.login-btn[disabled]{ opacity:.7; cursor:not-allowed }
+
+/* Sign up row */
+.signup-link{
+  text-align:center; margin-top:28px; padding-top:20px;
+  border-top:1px solid var(--border); color: var(--muted);
+}
+.signup-link a{ color: var(--accent); font-weight:700; text-decoration:none }
+.signup-link a:hover{ color: var(--accent-2) }
+
+/* Modals (glass) */
+.modal{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px;
+  background: rgba(0,0,0,.45); z-index:50;
+}
+.modal[hidden]{ display:none }
+.dialog{
+  width:100%; max-width:460px; padding:26px 22px;
+  background: var(--surface-strong);
+  border:1px solid var(--border); border-radius:20px; box-shadow: var(--shadow);
+  color: var(--text); position:relative;
+}
+@supports (backdrop-filter: blur(8px)){
+  .dialog{ backdrop-filter: blur(12px) saturate(120%); }
+}
+.dialog h2{ font-size:22px; margin-bottom:8px }
+.dialog p.muted{ color: var(--muted); margin-bottom:16px }
+.dialog .stack>*+*{ margin-top:16px }
+.dialog .row{ display:flex; gap:12px }
+.close-btn{
+  position:absolute; top:10px; right:10px;
+  border:none; background:transparent; font-size:22px; line-height:1; cursor:pointer; color:#b7d2c6
+}
+
+/* Toast */
+.toast{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+  background: var(--accent-2); color: var(--ink-on-accent);
+  padding:12px 16px; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.25);
+  font-weight:800; z-index:60; opacity:0; pointer-events:none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.toast.show{ opacity:1; transform: translateX(-50%) translateY(-4px) }
+.toast.error{ background: var(--danger); color: #fff }
+
+/* Responsive */
+@media (max-width:480px){
+  .login-container{ padding:34px 22px; margin:16px; border-radius:18px }
+  .brand{ font-size: clamp(1.25rem, 1rem + 2vw, 1.85rem) }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important }
+  .brand:hover .brand-leaf{ transform:none !important }
+}

@@ -1,0 +1,141 @@
+/* --------------------------
+   RecycloAI – Header layout & nav buttons (final)
+   Logo LEFT · Nav+Login RIGHT
+---------------------------*/
+
+/* ===== Base header layout (supports with/without .header-row) ===== */
+header {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px; /* visual styles (bg/blur/border) come from index.css */
+}
+
+/* Optional wrapper: keep content centered on page */
+header > .header-row {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0; /* header has padding already */
+}
+
+/* ===== Brand (ALWAYS LEFT) ===== */
+header > h1.brand,
+header > .header-row > h1.brand {
+  margin-right: auto !important;    /* <-- pins brand to LEFT */
+  font-size: clamp(1.45rem, 1rem + 2vw, 1.9rem); /* modest bump */
+}
+
+header .brand .brand-leaf { width: 1.12em; height: 1.12em; }
+header .brand .brand-ai   { font-size: .74em; padding: .28em .60em .32em; }
+
+/* ===== Nav + Login/Logout (ALWAYS RIGHT, TOGETHER) ===== */
+/* Nav block itself sits on the RIGHT */
+header > nav,
+header > .brand-nav,
+header > .header-row > nav,
+header > .header-row > .brand-nav {
+  margin-left: auto !important;      /* <-- pushes nav to the RIGHT */
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  flex: 0 0 auto !important;         /* don't stretch */
+}
+
+/* Login/Logout sits WITH the nav on the RIGHT, just after it */
+header > form[method="post"],
+header > .auth-slot,
+header > .header-row > form[method="post"],
+header > .header-row > .auth-slot {
+  margin-left: .75rem !important;    /* space next to nav */
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ===== Pill button styles (for nav links) ===== */
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .5rem .85rem;
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  font-size: .92rem;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.nav-btn:hover { transform: translateY(-1px); filter: brightness(1.06); border-color: rgba(255,255,255,.22); }
+.nav-btn:active { transform: translateY(0); }
+
+/* Primary emerald variant */
+.nav-btn--primary {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: var(--ink-on-accent);
+  box-shadow: 0 8px 18px rgba(16,185,129,.25), 0 2px 0 rgba(0,0,0,.25) inset;
+  border-color: transparent;
+}
+
+/* Subtle danger (logout) */
+.nav-btn--danger {
+  background: linear-gradient(180deg, rgba(239,68,68,.12), rgba(239,68,68,.06));
+  border-color: rgba(239,68,68,.35);
+  color: #fecaca;
+}
+.nav-btn--danger:hover { border-color: rgba(239,68,68,.5); filter: brightness(1.05); }
+
+/* Make POST logout forms look like buttons inline */
+.nav-inline-form { display: inline-block; margin: 0; }
+.nav-inline-form button { all: unset; }
+.nav-inline-form .nav-btn { cursor: pointer; }
+
+/* Optional legacy login-btn (if used) */
+header .login-btn {
+  --btn-bg: linear-gradient(90deg, var(--accent), var(--accent-2));
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem .95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  font-weight: 800;
+  font-size: .95rem;
+  letter-spacing: .2px;
+  text-decoration: none;
+  color: var(--ink-on-accent);
+  background: var(--btn-bg);
+  box-shadow: 0 8px 18px rgba(16,185,129,.25), 0 2px 0 rgba(0,0,0,.25) inset;
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+}
+header .login-btn:hover { transform: translateY(-1px); filter: brightness(1.07); }
+header .login-btn:active { transform: translateY(0); }
+header .login-btn:focus-visible { outline: 2px solid #94a3b8; outline-offset: 3px; }
+header .login-btn svg { display: inline-block; flex: 0 0 auto; }
+
+/* ===== Mobile polish ===== */
+@media (max-width: 520px){
+  header > h1.brand,
+  header > .header-row > h1.brand {
+    font-size: clamp(1.35rem, 1rem + 3vw, 1.7rem);
+  }
+  header .brand .brand-leaf { width: 1.04em; height: 1.04em; }
+}
+@media (prefers-reduced-motion: reduce){
+  .nav-btn, header .login-btn { transition: none; }
+}
+/* === FORCE LOGO HARD-LEFT (final override) === */
+header h1.brand{
+  flex: 0 0 auto !important;   /* don't stretch */
+  width: auto !important;       /* no accidental 100% width */
+  margin: 0 !important;         
+  margin-right: auto !important;/* push everything else right */
+  text-align: left !important;
+}

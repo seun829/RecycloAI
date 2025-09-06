@@ -230,3 +230,51 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsDataURL(file);
   });
 });
+
+// Append a classification log to localStorage so Progress can read it
+(function(){
+  const LS_KEY = "recycloai_logs";
+  function load(){ try { return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); } catch { return []; } }
+  function save(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+
+  window.saveClassification = function({ label, confidence, city }){
+    const logs = load();
+    logs.push({
+      ts: Date.now(),
+      label,                    // e.g., "Recyclable" / "Compost" / "Landfill" / "Other"
+      confidence: Number(confidence) || null, // 0..1 or %
+      city: city || document.getElementById("city-input")?.value || ""
+    });
+    // keep it tidy (last 10k)
+    if (logs.length > 10000) logs.splice(0, logs.length - 10000);
+    save(logs);
+  };
+})();
+
+// Save a classification to the signed-in user's account
+async function saveClassification({ label, confidence, city }) {
+  try {
+    await fetch("/api/logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({
+        label,
+        confidence: (typeof confidence === "number" ? confidence : Number(confidence) || null),
+        city: city || document.getElementById("city-input")?.value || ""
+      })
+    });
+  } catch (e) {
+    // Silently ignore if offline/not logged in
+    console.warn("log save failed", e);
+  }
+}
+
+/* Example: AFTER you compute a result, call:
+saveClassification({
+  label: result.label,           // "Recyclable" | "Compost" | "Landfill" | "Other"
+  confidence: result.confidence, // optional number (0..1 or 0..100; we accept either)
+  city: /* optional */ 
+
+
+

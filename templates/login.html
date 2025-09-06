@@ -1,356 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RecycloAI - Smart Recycling Assistant</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <title>RecycloAI - Smart Recycling Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Animated background elements */
-        .bg-animation {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .leaf {
-            position: absolute;
-            background: rgba(76, 175, 80, 0.1);
-            border-radius: 50% 0;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .leaf:nth-child(1) {
-            width: 60px;
-            height: 60px;
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .leaf:nth-child(2) {
-            width: 40px;
-            height: 40px;
-            top: 70%;
-            right: 20%;
-            animation-delay: 2s;
-        }
-
-        .leaf:nth-child(3) {
-            width: 80px;
-            height: 80px;
-            bottom: 20%;
-            left: 15%;
-            animation-delay: 4s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
-        }
-
-        /* Main container */
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 48px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.15);
-            position: relative;
-            z-index: 1;
-            animation: slideUp 0.8s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Logo and branding */
-        .logo-container {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
-            border-radius: 20px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .logo::before {
-            content: '♻';
-            font-size: 40px;
-            color: white;
-            animation: spin 8s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .app-name {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-
-        .app-tagline {
-            color: #666;
-            font-size: 14px;
-            font-weight: 400;
-        }
-
-        /* Form styles */
-        .login-form {
-            margin-top: 32px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .form-input:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .form-input::placeholder {
-            color: #aaa;
-        }
-
-        /* Login button */
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(76, 175, 80, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Additional options */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 24px 0;
-            font-size: 14px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            color: #666;
-        }
-
-        .remember-me input {
-            margin-right: 8px;
-            accent-color: #4CAF50;
-        }
-
-        .forgot-password {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .forgot-password:hover {
-            color: #2E7D32;
-        }
-
-        /* Sign up link */
-        .signup-link {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #e0e0e0;
-            color: #666;
-        }
-
-        .signup-link a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .signup-link a:hover {
-            color: #2E7D32;
-        }
-
-        /* Responsive design */
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 32px 24px;
-                margin: 16px;
-                border-radius: 16px;
-            }
-            
-            .app-name {
-                font-size: 24px;
-            }
-        }
-    </style>
+  <!-- Flask static -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="leaf"></div>
-        <div class="leaf"></div>
-        <div class="leaf"></div>
+  <!-- Animated background -->
+  <div class="bg-animation" aria-hidden="true">
+    <div class="leaf"></div>
+    <div class="leaf"></div>
+    <div class="leaf"></div>
+  </div>
+
+  <!-- Auth card -->
+  <div class="login-container" aria-labelledby="app-title">
+    <div class="logo-container">
+    <h1 class="brand" aria-label="RecycloAI">
+        <span class="brand-prim">Recyclo</span>
+        <svg class="brand-leaf" aria-hidden="true" viewBox="0 0 36 36" width="28" height="28">
+        <defs>
+            <linearGradient id="gradBrand" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+            <stop offset="0"  stop-color="#34d399"/>
+            <stop offset="1"  stop-color="#10b981"/>
+            </linearGradient>
+            <filter id="leafGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.8" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+            </filter>
+        </defs>
+        <path fill="url(#gradBrand)" filter="url(#leafGlow)"
+            d="M30 6c-12 2-20 10-24 22 7-4 15-6 22-12-2 4-5 7-9 10 7 0 12-5 12-12 0-3-.4-5-.8-8Z"/>
+        </svg>
+        <span class="brand-ai" aria-hidden="true">AI</span>
+    </h1>
+    <p class="app-tagline">Smart Recycling Assistant</p>
     </div>
 
-    <div class="login-container">
-        <div class="logo-container">
-            <div class="logo"></div>
-            <h1 class="app-name">RecycloAI</h1>
-            <p class="app-tagline">Smart Recycling Assistant</p>
-        </div>
+    <form class="login-form" id="login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" id="email" class="form-input"
+               placeholder="Enter your email" required autocomplete="email" />
+      </div>
 
-        <form class="login-form" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    class="form-input" 
-                    placeholder="Enter your email"
-                    required
-                >
-            </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" class="form-input"
+               placeholder="Enter your password" required autocomplete="current-password" />
+      </div>
 
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    class="form-input" 
-                    placeholder="Enter your password"
-                    required
-                >
-            </div>
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="remember" /> Remember me
+        </label>
+        <a class="forgot-password" href="#" id="open-reset">Forgot password?</a>
+      </div>
 
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" id="remember">
-                    Remember me
-                </label>
-                <a href="#" class="forgot-password">Forgot password?</a>
-            </div>
+      <button type="submit" class="login-btn" id="login-btn">
+        Sign In to RecycloAI
+      </button>
+    </form>
 
-            <button type="submit" class="login-btn">
-                Sign In to RecycloAI
-            </button>
-        </form>
-
-        <div class="signup-link">
-            New to RecycloAI? <a href="#">Create an account</a>
-        </div>
+    <div class="signup-link">
+      New to RecycloAI? <a href="#" id="open-signup">Create an account</a>
     </div>
+  </div>
 
-    <script>
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Add loading state
-            const button = event.target.querySelector('.login-btn');
-            const originalText = button.textContent;
-            button.textContent = 'Signing in...';
-            button.style.background = 'linear-gradient(135deg, #66BB6A, #4CAF50)';
-            
-            // Simulate login process
-            setTimeout(() => {
-                alert(`Welcome back! Logging in as ${email}`);
-                button.textContent = originalText;
-                button.style.background = 'linear-gradient(135deg, #4CAF50, #2E7D32)';
-            }, 1500);
-        }
+  <!-- Signup Modal -->
+  <section class="modal" id="signup-modal" role="dialog" aria-modal="true"
+           aria-labelledby="signup-title" hidden>
+    <div class="dialog" data-modal>
+      <button class="close-btn" type="button" aria-label="Close" data-close>&times;</button>
+      <h2 id="signup-title">Create your account</h2>
+      <p class="muted">Join RecycloAI to start sorting smarter.</p>
+      <form id="signup-form" class="stack" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="su-name">Full name</label>
+          <input id="su-name" class="form-input" type="text" required placeholder="Alex Doe" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="su-email">Email</label>
+          <input id="su-email" class="form-input" type="email" required placeholder="you@domain.com" autocomplete="email" />
+        </div>
+        <div class="row">
+          <div class="form-group" style="flex:1">
+            <label class="form-label" for="su-pass">Password</label>
+            <input id="su-pass" class="form-input" type="password" required placeholder="At least 6 characters" autocomplete="new-password" />
+          </div>
+          <div class="form-group" style="flex:1">
+            <label class="form-label" for="su-pass2">Confirm</label>
+            <input id="su-pass2" class="form-input" type="password" required placeholder="Repeat password" autocomplete="new-password" />
+          </div>
+        </div>
+        <button type="submit" class="login-btn" id="signup-btn">Create account</button>
+        <p class="muted">Already have an account? <a class="link" href="#" data-close>Back to sign in</a></p>
+      </form>
+    </div>
+  </section>
 
-        // Add subtle parallax effect to floating elements
-        document.addEventListener('mousemove', (e) => {
-            const leaves = document.querySelectorAll('.leaf');
-            const mouseX = e.clientX / window.innerWidth;
-            const mouseY = e.clientY / window.innerHeight;
-            
-            leaves.forEach((leaf, index) => {
-                const speed = (index + 1) * 2;
-                const x = mouseX * speed;
-                const y = mouseY * speed;
-                leaf.style.transform += ` translate(${x}px, ${y}px)`;
-            });
-        });
-    </script>
+  <!-- Reset Modal -->
+  <section class="modal" id="reset-modal" role="dialog" aria-modal="true"
+           aria-labelledby="reset-title" hidden>
+    <div class="dialog" data-modal>
+      <button class="close-btn" type="button" aria-label="Close" data-close>&times;</button>
+      <h2 id="reset-title">Reset your password</h2>
+      <p class="muted">Enter the email you use for RecycloAI. We’ll send reset instructions.</p>
+      <form id="reset-form" class="stack" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="rp-email">Email</label>
+          <input id="rp-email" class="form-input" type="email" required placeholder="you@domain.com" autocomplete="email" />
+        </div>
+        <button type="submit" class="login-btn" id="reset-btn">Send reset link</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Flask static -->
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
 </html>

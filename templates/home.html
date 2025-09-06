@@ -5,30 +5,43 @@
   <title>RecycloAI – Recyclability Detector</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index2.css') }}" />
 </head>
 <body>
   <header>
-    <h1 class="brand" aria-label="RecycloAI">
+    <div class="header-row header-3col">
+      <h1 class="brand" aria-label="RecycloAI">
         <span class="brand-prim">Recyclo</span>
         <svg class="brand-leaf" aria-hidden="true" viewBox="0 0 36 36" width="28" height="28">
-            <defs>
+          <defs>
             <linearGradient id="gradBrand" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-                <stop offset="0"  stop-color="#22d3ee"/>
-                <stop offset="1"  stop-color="#a78bfa"/>
+              <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
             </linearGradient>
             <filter id="leafGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="1.8" result="blur"/>
-                <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-                </feMerge>
+              <feGaussianBlur stdDeviation="1.8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
-            </defs>
-            <path fill="url(#gradBrand)" filter="url(#leafGlow)"
-                d="M30 6c-12 2-20 10-24 22 7-4 15-6 22-12-2 4-5 7-9 10 7 0 12-5 12-12 0-3-.4-5-.8-8Z"/>
+          </defs>
+          <path fill="url(#gradBrand)" filter="url(#leafGlow)" d="M30 6c-12 2-20 10-24 22 7-4 15-6 22-12-2 4-5 7-9 10 7 0 12-5 12-12 0-3-.4-5-.8-8Z"/>
         </svg>
         <span class="brand-ai" aria-hidden="true">AI</span>
-    </h1>
+      </h1>
+
+      <nav class="brand-nav" aria-label="Primary">
+        <a class="nav-btn" href="{{ url_for('index') }}">Detector</a>
+        <a class="nav-btn" href="{{ url_for('charities') }}">Charities</a>
+        <a class="nav-btn" href="{{ url_for('progress') }}">Progress</a>
+      </nav>
+
+      <div class="auth-slot">
+        {% if current_user.is_authenticated %}
+          <form class="nav-inline-form" action="{{ url_for('api_logout') }}" method="post">
+            <button class="nav-btn nav-btn--danger" type="submit">Logout</button>
+          </form>
+        {% else %}
+          <a class="nav-btn nav-btn--primary" href="{{ url_for('auth.login') }}">Login</a>
+        {% endif %}
+      </div>
+    </div>
   </header>
 
   <main>
@@ -89,12 +102,38 @@
       </div>
     </section>
 
-    <div style="text-align:center; margin-top:2rem;">
-      <a href="{{ url_for('charities') }}"
-         style="background:#22d3ee; padding:1rem 1.5rem; border-radius:12px; color:#0f172a; font-weight:bold; text-decoration:none;">
-        🌍 Explore Verified Recycling Charities
+    <!-- CTA row: Charities + Progress (theme-aligned) -->
+    <div style="
+      display:flex; justify-content:center; align-items:center; gap:12px;
+      margin-top:2rem; flex-wrap:wrap;
+    ">
+      <!-- Primary: Charities (emerald gradient) -->
+      <a href="{{ url_for('charities') }}" style="
+        display:inline-flex; align-items:center; gap:.55rem;
+        padding:1rem 1.25rem; border-radius:12px; text-decoration:none;
+        font-weight:800; letter-spacing:.2px;
+        background:linear-gradient(90deg, var(--accent), var(--accent-2));
+        color:var(--ink-on-accent);
+        border:1px solid rgba(255,255,255,.12);
+        box-shadow: 0 8px 18px rgba(16,185,129,.25), 0 2px 0 rgba(0,0,0,.25) inset;
+      ">
+        <span>Explore Verified Recycling Charities</span>
+      </a>
+
+      <!-- Secondary: Progress (glassy pill) -->
+      <a href="{{ url_for('progress') }}" style="
+        display:inline-flex; align-items:center; gap:.55rem;
+        padding:1rem 1.25rem; border-radius:12px; text-decoration:none;
+        font-weight:800; letter-spacing:.2px;
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        color: var(--text);
+        border:1px solid var(--border);
+        box-shadow: var(--shadow);
+      ">
+        <span>View Progress &amp; Logs</span>
       </a>
     </div>
+
   </main>
 
   <footer>

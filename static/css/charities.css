@@ -1,32 +1,32 @@
 /* --------------------------
-   RecycleAI - Charities / Listing (Dark Green)
+   RecycloAI – Charities / Listing (Glassy Eco Refresh)
 ---------------------------*/
 
 /* Design tokens */
 :root {
-  /* Backgrounds */
-  --bg: #0a1a14;         /* very dark green-black */
-  --bg-2: #12241b;       /* deep forest green */
+  /* Backgrounds (lighter, greener) */
+  --bg: #0c2a20;                /* evergreen */
+  --bg-2: #164535;              /* forest */
 
   /* Surfaces */
-  --panel: rgba(18, 36, 27, 0.75);   /* dark frosted green glass */
-  --panel-solid: #15271f;            /* solid deep green */
-  --chip: #13251b;                   /* pill/list chip bg */
+  --panel: rgba(26, 66, 52, 0.62); /* frosted green glass */
+  --panel-solid: #1a4a39;          /* solid deep green */
+  --chip: #184235;                 /* pill/list chip bg */
 
   /* Lines & shadows */
-  --border: #1e3328;                 /* deep green-gray border */
-  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --border: #2a6a56;               /* emerald-tinted border */
+  --shadow: 0 12px 36px rgba(0,0,0,0.32);
 
   /* Text */
-  --text: #e5f7ee;                   /* light mint text */
-  --muted: #8aa897;                  /* muted sage */
+  --text: #eafbf3;                 /* minty white */
+  --muted: #c2e5d9;                /* pale sage */
 
   /* Accents */
-  --accent: #34d399;                 /* emerald */
-  --accent-2: #10b981;               /* teal */
-  --success: #22c55e;                /* bright success */
-  --danger: #ef4444;                 /* error red */
-  --ink-on-accent: #07130f;          /* text on green gradient */
+  --accent: #34d399;               /* emerald */
+  --accent-2: #10b981;             /* teal */
+  --success: #22c55e;              /* bright success */
+  --danger: #ef4444;               /* error red */
+  --ink-on-accent: #06241b;        /* text on green gradient */
 }
 
 * { box-sizing: border-box; }
@@ -34,9 +34,12 @@
 /* Base */
 body {
   margin: 0;
-  font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
-  background: linear-gradient(180deg, var(--bg), var(--bg-2));
   color: var(--text);
+  font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+  background:
+    radial-gradient(900px 520px at 10% -6%, rgba(52,211,153,.15), transparent 60%),
+    radial-gradient(820px 520px at 90% 2%, rgba(16,185,129,.10), transparent 62%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
 }
 
 /* Utility: screen-reader-only */
@@ -51,22 +54,29 @@ body {
 /* Top bar back button */
 .topbar { padding: 1rem; }
 .back-btn {
-  display: inline-block;
+  display: inline-flex; align-items:center; gap:.5rem;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1.1rem;
   border-radius: 12px;
   color: var(--ink-on-accent);
-  font-weight: bold;
+  font-weight: 800;
   text-decoration: none;
+  box-shadow: 0 10px 24px rgba(16,185,129,.22);
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
 }
-.back-btn:hover { filter: brightness(1.05); }
+.back-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.back-btn:active { transform: translateY(0); }
+.back-btn:focus-visible { outline: 2px solid #99f6e4; outline-offset: 3px; }
 
 /* Header & footer */
 header, footer {
   padding: 1rem 1.25rem;
   background: var(--panel);
-  backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 28px rgba(0,0,0,.16);
+}
+@supports (backdrop-filter: blur(8px)){
+  header, footer { backdrop-filter: blur(12px) saturate(110%); }
 }
 header h1 { margin: 0; font-size: 1.5rem; letter-spacing:.2px; }
 main { padding: 1.25rem; max-width: 1100px; margin: 0 auto; }
@@ -87,61 +97,125 @@ footer {
   padding: 1rem;
   border:1px solid var(--border);
   border-radius: 16px;
+  box-shadow: var(--shadow);
 }
 .control { display: flex; flex-direction: column; gap: .35rem; }
 .control--full { grid-column: 1 / -1; }
-.actions-row { display:flex; gap:.5rem; justify-content:flex-end; }
+.actions-row { display:flex; gap:.55rem; justify-content:flex-end; }
 
-label { font-size: .85rem; color: var(--muted); }
+label { font-size: .86rem; color: var(--muted); font-weight: 600; }
 
 input, select {
-  padding: .6rem .7rem;
-  background: var(--panel-solid);
+  padding: .65rem .75rem;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
   color: var(--text);
   border:1px solid var(--border);
   border-radius: 10px;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .12s ease, background .18s ease;
 }
 input::placeholder { color: var(--muted); }
+input:focus, select:focus {
+  border-color: rgba(52,211,153,.8);
+  box-shadow: 0 0 0 4px rgba(52,211,153,.18);
+  transform: translateY(-1px);
+}
 
+/* Buttons */
 button {
   cursor: pointer; border: none; border-radius: 12px;
-  padding: .75rem 1rem; font-weight: 600;
+  padding: .75rem 1rem; font-weight: 800; letter-spacing:.2px;
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
 }
 .btn-primary {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   color: var(--ink-on-accent);
-  box-shadow: var(--shadow);
+  box-shadow: 0 12px 26px rgba(16,185,129,.22), 0 2px 0 rgba(0,0,0,.24) inset;
 }
-.btn-ghost { background: transparent; color: var(--text); border:1px solid var(--border); }
+.btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:focus-visible { outline:2px solid #99f6e4; outline-offset:3px; }
+
+.btn-ghost {
+  background: transparent; color: var(--text); border:1px solid var(--border);
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+.btn-ghost:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.btn-ghost:focus-visible { outline:2px solid #99f6e4; outline-offset:3px; }
 
 /* Pills */
 .pills { display:flex; gap:.5rem; flex-wrap: wrap; }
 .pill {
-  font-size: .75rem; padding: .25rem .5rem; border-radius: 999px;
-  border:1px solid var(--border); background: var(--chip); color:#cde7db;
+  font-size: .78rem; padding: .28rem .58rem; border-radius: 999px;
+  border:1px solid var(--border); background: var(--chip); color:#e0fbf1;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18);
+  transition: transform .12s ease, border-color .18s ease, background .18s ease;
 }
+.pill:hover { transform: translateY(-1px); border-color: rgba(52,211,153,.55); background: #1c5140; }
 
 /* Toolbar */
-.toolbar { margin-top: .75rem; display:flex; align-items:center; justify-content: space-between; gap: .75rem; color: var(--muted); font-size:.9rem; }
+.toolbar {
+  margin-top: .75rem; display:flex; align-items:center; justify-content: space-between;
+  gap: .75rem; color: var(--muted); font-size:.92rem;
+}
 .sort { display:flex; gap:.5rem; align-items:center; }
 
-/* Results */
-.results { margin-top: 1rem; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
-.card {
-  display:flex; flex-direction: column; gap:.5rem;
-  background: var(--panel);
-  border:1px solid var(--border); border-radius: 18px; padding: 1rem;
-  box-shadow: var(--shadow);
+/* Results grid */
+.results {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 1rem;
 }
-.card h3 { margin:0; font-size: 1.05rem; }
-.meta { display:flex; gap:.5rem; flex-wrap: wrap; align-items:center; font-size:.85rem; color:#cde7db; }
-.rating { font-weight:700; }
-.verified { display:inline-flex; align-items:center; gap:.35rem; font-size:.8rem; color: var(--success); }
+
+/* Cards */
+.card {
+  display:flex; flex-direction: column; gap:.55rem;
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border:1px solid var(--border);
+  border-radius: 18px; padding: 1rem;
+  box-shadow: var(--shadow);
+  transition: transform .14s ease, box-shadow .2s ease, border-color .2s ease;
+  position: relative;
+  overflow: hidden;
+}
+@supports (backdrop-filter: blur(8px)){
+  .card { backdrop-filter: blur(10px) saturate(112%); }
+}
+.card::after{
+  /* subtle top gradient gleam */
+  content:""; position:absolute; left:0; right:0; top:0; height:38px; pointer-events:none;
+  background: linear-gradient(180deg, rgba(255,255,255,.10), transparent);
+}
+.card h3 { margin:0; font-size: 1.08rem; letter-spacing:.2px; }
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(0,0,0,.28);
+  border-color: rgba(52,211,153,.45);
+}
+
+/* Meta row */
+.meta {
+  display:flex; gap:.55rem; flex-wrap: wrap; align-items:center;
+  font-size:.88rem; color:#d9f6ec;
+}
+.rating { font-weight:800; color: #f7fee7; } /* soft light for rating */
+.verified {
+  display:inline-flex; align-items:center; gap:.35rem; font-size:.82rem; color: var(--success);
+  padding: .15rem .45rem; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(34,197,94,.12), rgba(34,197,94,.06));
+  border: 1px solid rgba(34,197,94,.32);
+}
 .verified svg { width: 14px; height: 14px; }
-.actions { margin-top: auto; display:flex; gap:.5rem; }
+
+/* Card actions */
+.actions { margin-top: auto; display:flex; gap:.55rem; }
+
+/* Empty state */
 .empty {
   text-align:center; color: var(--muted); padding: 2rem;
   border:1px dashed var(--border); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
 }
 
 /* Banner */
@@ -150,10 +224,19 @@ button {
   padding: .75rem 1rem;
   border:1px solid var(--border);
   border-radius: 12px;
-  background: var(--panel);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
   color: var(--muted);
 }
-.banner.error { color: var(--danger); border-color: var(--border); }
+.banner.error {
+  color: #fecaca; /* soft red text */
+  border-color: rgba(239, 68, 68, .45);
+  background: linear-gradient(180deg, rgba(239,68,68,.12), rgba(239,68,68,.06));
+}
+
+/* Focus visible for interactive elements inside cards */
+.card a:focus-visible, .card button:focus-visible {
+  outline: 2px solid #99f6e4; outline-offset: 3px;
+}
 
 /* Responsive */
 @media (max-width: 1024px){
@@ -164,3 +247,182 @@ button {
   .results { grid-template-columns: 1fr; }
   .controls{ grid-template-columns: 1fr 1fr; }
 }
+
+/* Motion preference */
+@media (prefers-reduced-motion: reduce){
+  * { transition: none !important; animation: none !important; }
+}
+
+/* 1) Less glare overall (dial back halos) */
+body{
+  background:
+    radial-gradient(900px 520px at 10% -6%, rgba(52,211,153,.08), transparent 60%),
+    radial-gradient(820px 520px at 90% 2%,  rgba(16,185,129,.06), transparent 62%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+}
+
+/* Slightly dim panels so content pops without glare */
+:root{
+  --panel: rgba(26, 66, 52, 0.58);
+  --panel-solid: #163e30;
+  --chip: #173a2e;
+  --border: #235d4b;
+  --text: #e3f7ef;
+  --muted: #b6dcd0;
+}
+
+/* 2) Website + Donate buttons (works for <a> or <button>) */
+.actions a.btn-website,
+.actions .btn-website,
+.btn-website,
+.actions a[href*="http"]:not([href*="donate"]),  /* auto-catch plain website links */
+.actions .website {
+  display:inline-flex; align-items:center; gap:.45rem;
+  padding:.65rem .9rem;
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid var(--border);
+  color: var(--text);
+  text-decoration:none;
+  font-weight:700; letter-spacing:.2px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18);
+  transition: transform .12s ease, filter .2s ease, border-color .2s ease;
+}
+.actions a.btn-website:hover,
+.actions .btn-website:hover,
+.actions a[href*="http"]:not([href*="donate"]):hover,
+.actions .website:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  border-color: rgba(52,211,153,.5);
+}
+.actions a.btn-website:focus-visible,
+.actions .btn-website:focus-visible,
+.actions a[href*="http"]:not([href*="donate"]):focus-visible,
+.actions .website:focus-visible{ outline:2px solid #99f6e4; outline-offset:3px; }
+
+/* Donate = stronger call-to-action */
+.actions a.btn-donate,
+.actions .btn-donate,
+.btn-donate,
+.actions a[href*="donate"],
+.actions .donate {
+  display:inline-flex; align-items:center; gap:.45rem;
+  padding:.65rem 1rem;
+  border-radius:12px;
+  background: linear-gradient(90deg, #22c55e, #10b981);
+  color: var(--ink-on-accent);
+  text-decoration:none;
+  font-weight:800; letter-spacing:.2px;
+  box-shadow: 0 12px 26px rgba(16,185,129,.22), 0 2px 0 rgba(0,0,0,.24) inset;
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+}
+.actions a.btn-donate:hover,
+.actions .btn-donate:hover,
+.actions a[href*="donate"]:hover,
+.actions .donate:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+.actions a.btn-donate:focus-visible,
+.actions .btn-donate:focus-visible,
+.actions a[href*="donate"]:focus-visible,
+.actions .donate:focus-visible{ outline:2px solid #99f6e4; outline-offset:3px; }
+
+/* Optional simple icons without HTML changes */
+.btn-website::before,
+.actions a[href*="http"]:not([href*="donate"])::before{ content:"↗"; opacity:.9; }
+.btn-donate::before,
+.actions a[href*="donate"]::before{ content:"❤"; opacity:.9; }
+
+/* 3) Select menus: ensure options are readable on dark */
+:root{ color-scheme: dark; } /* hint to browsers for dark popup UI */
+
+.controls select,
+.controls input[type="search"],
+.controls input[type="text"],
+.controls input:not([type]), /* generic text inputs if any */
+.controls input[type="number"]{
+  background-color: var(--panel-solid);
+  color: var(--text);
+  border:1px solid var(--border);
+}
+
+/* Force option list colors (supported browsers) */
+.controls select option,
+.controls select optgroup{
+  background-color: #0f221b;   /* dark popup background */
+  color: #e9fbf3;              /* readable text */
+}
+
+/* Highlight states inside the dropdown (where supported) */
+.controls select option:checked,
+.controls select option:focus,
+.controls select option:hover{
+  background-color: #1b3d33;
+  color: #e9fbf3;
+}
+
+/* Strong, but not blinding focus ring */
+.controls select:focus,
+.controls input:focus{
+  border-color: rgba(52,211,153,.75);
+  box-shadow: 0 0 0 3px rgba(52,211,153,.20);
+  transform: translateY(-1px);
+}
+
+/* Avoid any stacking/overlay weirdness with dropdowns */
+.controls{ position: relative; z-index: 0; }
+
+/* =========================
+   FLICKER FIX (cards/grid)
+   ========================= */
+
+/* 1) Give the grid its own paint container so children don’t fight for layers */
+.results{
+  contain: paint;           /* isolates painting of children */
+  isolation: isolate;       /* new stacking context; helps with sticky header blends */
+  will-change: contents;    /* hint without over-promoting each child */
+}
+
+/* 2) Make each card its own stable layer (no z-fighting with neighbors) */
+.card{
+  transform: translateZ(0);         /* promote to GPU layer */
+  backface-visibility: hidden;      /* avoid backside artifacts */
+  will-change: transform, box-shadow;
+}
+
+/* Keep the same transform property across states (prevents layer churn) */
+.card:hover{
+  transform: translateY(-2px) translateZ(0);
+}
+
+/* 3) Turn OFF backdrop-filter on cards (most common flicker culprit) */
+.card{
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Keep glass on big panels/header where it’s safer */
+@supports (backdrop-filter: blur(8px)){
+  .controls, header, footer{
+    -webkit-backdrop-filter: blur(12px) saturate(110%);
+    backdrop-filter: blur(12px) saturate(110%);
+  }
+}
+
+/* 4) Shadows/filters are expensive—dial them back slightly to reduce repaints */
+.card{
+  box-shadow: 0 10px 28px rgba(0,0,0,.26);   /* was heavier */
+}
+.card:hover{
+  box-shadow: 0 16px 36px rgba(0,0,0,.28);
+}
+
+/* 5) Dropdowns over grid: ensure the select popover never “clips” cards */
+.controls{ position: relative; z-index: 2; }
+.results{ position: relative; z-index: 1; }
+
+/* 6) If you still see flashes on some GPUs, disable transform on hover as a last resort */
+/* .card:hover{ transform: none; } */
+
