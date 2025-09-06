@@ -45,3 +45,22 @@ def signup():
 def api_logout():
     logout_user()
     return jsonify({"ok": True})
+
+@auth_bp.route("/api/reset", methods=["POST"])
+def api_reset():
+    return jsonify({"ok": True})
+
+
+@auth_bp.route("/logout", methods=["POST"])
+@login_required
+def logout_post():
+  logout_user()
+  return jsonify({"ok": True}), 200
+
+@auth_bp.route("/logout", methods=["GET"])
+@login_required
+def logout_get():
+  logout_user()
+  return redirect("/")
+
+

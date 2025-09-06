@@ -1,8 +1,8 @@
 // Toggle this to use real endpoints instead of demo localStorage.
-const USE_API = false;
+const USE_API = true;
 const API = {
-  login: "/api/login",
-  signup: "/api/signup",
+  login: "/login",
+  signup: "/signup",
   reset: "/api/reset"
 };
 
@@ -12,6 +12,7 @@ const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
 function showToast(msg, type = "ok") {
   const el = $("#toast");
+  if (!el) return;
   el.textContent = msg;
   el.classList.toggle("error", type === "error");
   el.classList.add("show");
@@ -47,6 +48,7 @@ function saveUsers(users) {
 // ---------- Parallax (non-accumulating) ----------
 (() => {
   const leaves = $$(".leaf");
+  if (!leaves.length) return;
   let raf = null;
   let target = { x: 0, y: 0 };
 
@@ -95,6 +97,7 @@ function trapFocus(modal) {
 let lastActive = null;
 
 function openModal(modal) {
+  if (!modal) return;
   lastActive = document.activeElement;
   modal.hidden = false;
   // Click outside to close
@@ -107,9 +110,83 @@ function openModal(modal) {
 }
 
 function closeModal(modal) {
+  if (!modal) return;
   modal.hidden = true;
   if (modal._untrap) modal._untrap();
   if (lastActive) lastActive.focus();
+}
+
+// ---------- Logout (server + client fallback) ----------
+async function doLogout(e) {
+  if (e) e.preventDefault();
+  // Try POST /logout so Flask can clear the session cookie
+  try {
+    const res = await fetch("/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin"
+    });
+    if (!res.ok && res.status !== 204) {
+      // Some apps only support GET: fall back to a navigation
+      window.location.href = "/logout";
+      return;
+    }
+  } catch {
+    // If POST fails (no route), try GET
+    window.location.href = "/logout";
+    return;
+  }
+
+  // Client-side cleanup (harmless; real auth is server cookie)
+  try { localStorage.removeItem(LS_SESSION); } catch {}
+  // Send them somewhere public; adjust if your login page is different
+  window.location.href = "/";
+}
+
+function bindLogout(scope = document) {
+  const candidates = [
+    '#logout-btn',
+    '[data-action="logout"]',
+    'a[href="/logout"]' // intercept plain links to ensure POST + cleanup
+  ];
+  candidates.forEach(sel => {
+    $$(sel, scope).forEach(el => {
+      el.addEventListener("click", doLogout);
+    });
+  });
+}
+
+// ---------- Clone homepage header (exact markup + styles) ----------
+async function syncHeaderFromHome() {
+  try {
+    const res = await fetch("/", { credentials: "same-origin" });
+    if (!res.ok) return;
+
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    // Copy stylesheet <link> tags so header looks identical
+    const homeLinks = doc.querySelectorAll('link[rel="stylesheet"]');
+    homeLinks.forEach(link => {
+      const href = link.getAttribute("href");
+      if (!href) return;
+      if (!document.querySelector(`link[rel="stylesheet"][href="${href}"]`)) {
+        document.head.appendChild(link.cloneNode(true));
+      }
+    });
+
+    // Replace current header with homepage header (prefer #site-header)
+    const homeHeader = doc.querySelector("#site-header") || doc.querySelector("header");
+    const currentHeader = document.querySelector("#site-header") || document.querySelector("header");
+    if (homeHeader && currentHeader) {
+      const clone = homeHeader.cloneNode(true);
+      currentHeader.replaceWith(clone);
+      // Re-bind logout (new nodes)
+      bindLogout(document);
+    }
+  } catch {
+    // Silently ignore if homepage not reachable
+  }
 }
 
 // ---------- Wire up UI ----------
@@ -123,137 +200,180 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupModal = $("#signup-modal");
   const resetModal = $("#reset-modal");
 
-  $("#open-signup").addEventListener("click", (e) => { e.preventDefault(); openModal(signupModal); });
-  $("#open-reset").addEventListener("click", (e) => { e.preventDefault(); openModal(resetModal); });
+  $("#open-signup")?.addEventListener("click", (e) => { e.preventDefault(); openModal(signupModal); });
+  $("#open-reset")?.addEventListener("click", (e) => { e.preventDefault(); openModal(resetModal); });
 
   // Prefill remembered email
   const remembered = localStorage.getItem(LS_REMEMBER);
-  if (remembered) {
+  if (remembered && emailEl) {
     emailEl.value = remembered;
-    remember.checked = true;
+    if (remember) remember.checked = true;
   }
 
   // ------ Login ------
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = emailEl.value.trim();
-    const pass = passEl.value;
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = (emailEl?.value || "").trim();
+      const pass = passEl?.value || "";
 
-    if (!validateEmail(email)) return showToast("Enter a valid email", "error");
-    if (!pass) return showToast("Password required", "error");
+      if (!validateEmail(email)) return showToast("Enter a valid email", "error");
+      if (!pass) return showToast("Password required", "error");
 
-    const original = loginBtn.textContent;
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Signing in...";
+      const original = loginBtn?.textContent;
+      if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = "Signing in..."; }
 
-    try {
-      if (USE_API) {
-        const res = await fetch(API.login, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password: pass })
-        });
-        if (!res.ok) throw new Error("Login failed");
-        const user = await res.json();
-        postLogin(user, remember.checked, email);
-      } else {
-        const user = getUsers().find(u => u.email.toLowerCase() === email.toLowerCase() && u.pass === pass);
-        if (!user) throw new Error("Invalid credentials");
-        postLogin(user, remember.checked, email);
+      try {
+        if (USE_API) {
+          const res = await fetch(API.login, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin", // send/receive Flask session cookie
+            redirect: "follow",
+            body: JSON.stringify({ email, password: pass })
+          });
+          if (!res.ok && res.status !== 204) {
+            let msg = "Login failed";
+            try {
+              const ct = res.headers.get("content-type") || "";
+              if (ct.includes("application/json")) {
+                const j = await res.json();
+                msg = j.error || j.message || msg;
+              } else {
+                const t = await res.text();
+                if (t) msg = t;
+              }
+            } catch {}
+            throw new Error(msg);
+          }
+
+          if (res.redirected) {
+            window.location.href = "/progress";
+            return;
+          }
+
+          let user = { email, name: email.split("@")[0] };
+          try {
+            const ct = res.headers.get("content-type") || "";
+            if (ct.includes("application/json")) {
+              const j = await res.json();
+              if (j && (j.email || j.user)) {
+                const u = j.user || j;
+                user = { email: u.email || email, name: u.name || user.name };
+              }
+            }
+          } catch {}
+          postLogin(user, !!(remember && remember.checked), email);
+        } else {
+          const user = getUsers().find(u => u.email.toLowerCase() === email.toLowerCase() && u.pass === pass);
+          if (!user) throw new Error("Invalid credentials");
+          postLogin(user, !!(remember && remember.checked), email);
+        }
+      } catch (err) {
+        showToast(err.message || "Unable to sign in", "error");
+      } finally {
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = original || "Sign in"; }
       }
-    } catch (err) {
-      showToast(err.message || "Unable to sign in", "error");
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = original;
-    }
-  });
+    });
+  }
 
   function postLogin(user, rememberOn, email) {
     if (rememberOn) localStorage.setItem(LS_REMEMBER, email);
     else localStorage.removeItem(LS_REMEMBER);
-
-    localStorage.setItem(LS_SESSION, JSON.stringify({ email: user.email, name: user.name }));
+    try {
+      localStorage.setItem(LS_SESSION, JSON.stringify({ email: user.email, name: user.name }));
+    } catch {}
     showToast(`Welcome back, ${user.name || user.email}!`);
-    // Redirect where you want after login:
-    setTimeout(() => { window.location.href = "/dashboard"; }, 800);
+    setTimeout(() => { window.location.href = "/progress"; }, 300);
   }
 
   // ------ Signup ------
   const suForm = $("#signup-form");
-  suForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = $("#su-name").value.trim();
-    const email = $("#su-email").value.trim();
-    const pass = $("#su-pass").value;
-    const pass2 = $("#su-pass2").value;
+  if (suForm) {
+    suForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = $("#su-name")?.value.trim() || "";
+      const email = $("#su-email")?.value.trim() || "";
+      const pass = $("#su-pass")?.value || "";
+      const pass2 = $("#su-pass2")?.value || "";
 
-    if (!name) return showToast("Please enter your name", "error");
-    if (!validateEmail(email)) return showToast("Enter a valid email", "error");
-    if (pass.length < 6) return showToast("Password must be at least 6 characters", "error");
-    if (pass !== pass2) return showToast("Passwords do not match", "error");
+      if (!name) return showToast("Please enter your name", "error");
+      if (!validateEmail(email)) return showToast("Enter a valid email", "error");
+      if (pass.length < 6) return showToast("Password must be at least 6 characters", "error");
+      if (pass !== pass2) return showToast("Passwords do not match", "error");
 
-    const btn = $("#signup-btn");
-    const original = btn.textContent;
-    btn.disabled = true; btn.textContent = "Creating...";
+      const btn = $("#signup-btn");
+      const original = btn?.textContent;
+      if (btn) { btn.disabled = true; btn.textContent = "Creating..."; }
 
-    try {
-      if (USE_API) {
-        const res = await fetch(API.signup, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password: pass })
-        });
-        if (!res.ok) throw new Error("Signup failed");
-        showToast("Account created! You can sign in now.");
-      } else {
-        const users = getUsers();
-        if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-          throw new Error("Email already registered");
+      try {
+        if (USE_API) {
+          const res = await fetch(API.signup, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ name, email, password: pass })
+          });
+          if (!res.ok && res.status !== 201) throw new Error("Signup failed");
+          showToast("Account created! You can sign in now.");
+        } else {
+          const users = getUsers();
+          if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+            throw new Error("Email already registered");
+          }
+          users.push({ name, email, pass });
+          saveUsers(users);
+          showToast("Account created! You can sign in now.");
         }
-        users.push({ name, email, pass });
-        saveUsers(users);
-        showToast("Account created! You can sign in now.");
+        closeModal(signupModal);
+        const emailInput = $("#email");
+        if (emailInput) emailInput.value = email;
+        $("#password")?.focus();
+      } catch (err) {
+        showToast(err.message || "Unable to sign up", "error");
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = original || "Create account"; }
       }
-      closeModal(signupModal);
-      $("#email").value = email; // convenience
-      $("#password").focus();
-    } catch (err) {
-      showToast(err.message || "Unable to sign up", "error");
-    } finally {
-      btn.disabled = false; btn.textContent = original;
-    }
-  });
+    });
+  }
 
   // ------ Reset ------
   const rpForm = $("#reset-form");
-  rpForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = $("#rp-email").value.trim();
-    if (!validateEmail(email)) return showToast("Enter a valid email", "error");
+  if (rpForm) {
+    rpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("#rp-email")?.value.trim() || "";
+      if (!validateEmail(email)) return showToast("Enter a valid email", "error");
 
-    const btn = $("#reset-btn");
-    const original = btn.textContent;
-    btn.disabled = true; btn.textContent = "Sending...";
+      const btn = $("#reset-btn");
+      const original = btn?.textContent;
+      if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
 
-    try {
-      if (USE_API) {
-        const res = await fetch(API.reset, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        if (!res.ok) throw new Error("Unable to send reset link");
-      } else {
-        // Demo: pretend we sent it
-        await new Promise(r => setTimeout(r, 600));
+      try {
+        if (USE_API) {
+          const res = await fetch(API.reset, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ email })
+          });
+          if (!res.ok && res.status !== 204) throw new Error("Unable to send reset link");
+        } else {
+          await new Promise(r => setTimeout(r, 600));
+        }
+        showToast("If an account exists, a reset link was sent.");
+        closeModal(resetModal);
+      } catch (err) {
+        showToast(err.message || "Unable to reset password", "error");
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = original || "Send reset link"; }
       }
-      showToast("If an account exists, a reset link was sent.");
-      closeModal(resetModal);
-    } catch (err) {
-      showToast(err.message || "Unable to reset password", "error");
-    } finally {
-      btn.disabled = false; btn.textContent = original;
-    }
-  });
+    });
+  }
+
+  // Make sure logout works wherever the button/link appears
+  bindLogout(document);
+
+  // Ensure header (markup + styles) exactly matches homepage
+  syncHeaderFromHome();
 });

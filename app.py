@@ -177,6 +177,14 @@ app.register_blueprint(auth_bp)  # /login, /signup, /api/logout
 def api_logout_alias():
     return bp_api_logout()
 
+
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("progress.html")
+
+
 # ---------------- Pages ----------------
 @app.route("/", endpoint="index")
 def home():
@@ -353,4 +361,4 @@ def api_clear_logs():
 # ---------------- Main ----------------
 if __name__ == "__main__":
     ensure_sqlite_schema(app)   # repair/align existing DB
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
