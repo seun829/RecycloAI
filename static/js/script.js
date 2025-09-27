@@ -276,5 +276,24 @@ saveClassification({
   confidence: result.confidence, // optional number (0..1 or 0..100; we accept either)
   city: /* optional */ 
 
+// --- Persist <details> open/close state for Tips ---
+(function(){
+  const details = document.querySelector('details#tips-container[data-pref]');
+  if (!details) return;
 
+  const key = 'recycloai:' + details.dataset.pref;
 
+  // Restore
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved === 'open') details.setAttribute('open', '');
+    if (saved === 'closed') details.removeAttribute('open');
+  } catch(e){ /* storage may be blocked; ignore */ }
+
+  // Save on toggle
+  details.addEventListener('toggle', () => {
+    try {
+      localStorage.setItem(key, details.open ? 'open' : 'closed');
+    } catch(e){ /* ignore */ }
+  });
+})();

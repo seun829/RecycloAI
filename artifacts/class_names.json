@@ -1,1 +1,8 @@
-["Cardboard", "Glass", "Metal", "Paper", "Plastic", "Trash"]
+[
+  "cardboard",
+  "glass",
+  "metal",
+  "paper",
+  "plastic",
+  "trash"
+]

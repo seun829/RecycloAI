@@ -45,6 +45,43 @@
   </header>
 
   <main>
+    <details id="tips-container" class="panel tips-collapsible" aria-labelledby="tips-title" data-pref="tips-open">
+      <summary class="tips-summary">
+        <h2 id="tips-title">Quick Tips</h2>
+        <svg class="chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+
+      <ul class="tips-list" role="list" id="tips-panel">
+        <li>
+          <span class="tip-title">Fill the frame</span>
+          <span class="tip-desc">Center the item; step closer (don’t zoom) so it covers most of the view.</span>
+        </li>
+        <li>
+          <span class="tip-title">Cut glare, add light</span>
+          <span class="tip-desc">Use soft/indirect light and keep the lens steady to avoid blur.</span>
+        </li>
+        <li>
+          <span class="tip-title">Hands & background</span>
+          <span class="tip-desc">Hold by the edge; keep fingers out of the main view. Simple background helps.</span>
+        </li>
+        <li>
+          <span class="tip-title">Show labels/symbols</span>
+          <span class="tip-desc">Rotate once so logos, resin codes (♻︎), or material text are visible.</span>
+        </li>
+        <li>
+          <span class="tip-title">Prep the item</span>
+          <span class="tip-desc">Empty and quick-rinse; flatten cardboard; keep greasy paper/cardboard separate.</span>
+        </li>
+        <li>
+          <span class="tip-title">Local rules vary</span>
+          <span class="tip-desc">Use the “Context” city dropdown to apply your area’s guidance.</span>
+        </li>
+      </ul>
+    </details>
+
+
     <section id="classification-section">
       <div id="webcam-container" class="panel">
         <video id="camera-feed" autoplay muted playsinline></video>
