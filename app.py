@@ -361,4 +361,4 @@ def api_clear_logs():
 # ---------------- Main ----------------
 if __name__ == "__main__":
     ensure_sqlite_schema(app)   # repair/align existing DB
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
