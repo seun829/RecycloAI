@@ -26,6 +26,14 @@
     .badge--compost{border-color:rgba(34,197,94,.5)}
     .badge--landfill{border-color:rgba(239,68,68,.45)}
     @media (max-width: 900px){ .charts{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+    /* === Disable hover lift for right-side header buttons === */
+    header .brand-nav .nav-btn:hover,
+    header .auth-slot .nav-btn:hover,
+    header .nav-inline-form .nav-btn:hover,
+    header .login-btn:hover {
+      transform: none !important;   /* stop the “lift” */
+    }
+
   </style>
 </head>
 <body>

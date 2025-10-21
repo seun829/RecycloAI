@@ -216,4 +216,13 @@ header h1.brand{
   .chev { transition: none !important; }
 }
 
+/* === Disable hover lift for right-side header buttons === */
+header .brand-nav .nav-btn:hover,
+header .auth-slot .nav-btn:hover,
+header .nav-inline-form .nav-btn:hover,
+header .login-btn:hover {
+  transform: none !important;   /* stop the “lift” */
+}
+
+
 

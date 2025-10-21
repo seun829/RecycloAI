@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from io import BytesIO
 import base64, json
-
+import random  # <-- for random tip selection
 
 from flask import Flask, request, jsonify, render_template
 from sqlalchemy import text, func
@@ -20,7 +20,7 @@ from torchvision.models import EfficientNet_B0_Weights
 from extensions import db, login_manager
 from models import User, ClassificationLog, normalize_label
 from auth import auth_bp, login_required, current_user  # re-exported from auth
-from auth import auth_bp, api_logout as bp_api_logout 
+from auth import auth_bp, api_logout as bp_api_logout
 
 from policy_engine import decide_action
 
@@ -105,7 +105,7 @@ def ensure_sqlite_schema(app: Flask):
 STATE_PATH = "best_efficientnet_model.pth"
 CLASS_NAMES_PATH = "artifacts/class_names.json"
 NUM_CLASSES_FALLBACK = 6
-THRESH = 0.70
+THRESH = 0.75
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _state = torch.load(STATE_PATH, map_location="cpu")
@@ -159,15 +159,91 @@ def prepare_image(img: Image.Image) -> torch.Tensor:
     arr = np.transpose(arr, (2, 0, 1))
     return torch.from_numpy(arr).unsqueeze(0).to(device)
 
+# ---------------- Tips (3 per class/action) + random selection ----------------
 TIPS = {
-    "Cardboard": "Flatten boxes and keep them dry; remove packing tape if you can.",
-    "Glass": "Rinse and remove caps; most programs take bottles and jars only.",
-    "Metal": "Rinse cans; crushing is optional but saves space.",
-    "Paper": "Keep it clean and dry; no greasy pizza boxes.",
-    "Plastic": "#1 and #2 bottles are most widely accepted.",
-    "Trash": "This item is not recyclable locally; consider reusing or proper disposal.",
-    "Unsure": "Try another angle or better light, or choose from a list."
+    "Cardboard": [
+        "Flatten boxes to save bin space and keep them dry.",
+        "Remove excessive tape and labels if possible.",
+        "Large boxes? Cut them down to 2×2 ft pieces."
+    ],
+    "Glass": [
+        "Rinse bottles and jars; remove caps and lids.",
+        "Only bottles and jars are accepted in most cities.",
+        "Avoid breaking glass—loose shards can contaminate."
+    ],
+    "Metal": [
+        "Rinse food and beverage cans before recycling.",
+        "Crushing cans is optional but saves space.",
+        "Foil is OK if it’s clean and balled up."
+    ],
+    "Paper": [
+        "Keep paper clean and dry; wet paper belongs in trash/compost per city rules.",
+        "No greasy pizza boxes unless your city allows food-soiled paper in organics.",
+        "Remove plastic windows from envelopes if easy; not required in many programs."
+    ],
+    "Plastic": [
+        "Rinse and empty; caps on or off depends on your city (on is common).",
+        "Prioritize #1 and #2 bottles and jugs—most widely accepted.",
+        "If it’s soft, scrunchable film, take it to store drop-off (not curbside)."
+    ],
+    "Trash": [
+        "This item isn’t accepted curbside—avoid wish-cycling.",
+        "When in doubt, check your city’s A-Z guide for proper disposal.",
+        "Consider reusing the item or choosing a reusable alternative next time."
+    ],
+    "Unsure": [
+        "Try another angle, better lighting, or remove background clutter.",
+        "Manually select a material or add attributes like ‘greasy/wet’.",
+        "Check your local recycling guide for specific items."
+    ],
 }
+
+ACTION_TIPS = {
+    "Recyclable": [
+        "Rinse/empty items and keep them dry to avoid contamination.",
+        "Don’t bag recyclables—place them loose in the cart.",
+        "If a piece is smaller than a credit card, it may not get captured."
+    ],
+    "Compost": [
+        "Remove plastic liners or stickers; only food-soiled fiber belongs.",
+        "Tear large pieces into smaller bits to speed up composting.",
+        "No plastics, glass, or metal in organics—even if ‘biodegradable’."
+    ],
+    "Landfill": [
+        "If it’s not accepted locally, place it in trash—don’t wish-cycle.",
+        "Reduce and reuse where possible to cut landfill waste.",
+        "Bundle messy trash to prevent leaks and pests."
+    ],
+    "Unsure": TIPS["Unsure"],  # reuse same three
+}
+
+def _pick_from_list(items: list[str]) -> str:
+    """Pick a tip based on a random number from 1 to 3 (index 0..2)."""
+    if not items:
+        return "Check local recycling guidelines for your area."
+    n = random.randint(1, 3)  # user request: choose a random number from 1..3
+    # If the list has fewer than 3 items, wrap safely
+    idx = (n - 1) % len(items)
+    return items[idx]
+
+def _tip_for(label: str | None, action: str | None) -> str:
+    """
+    Case-insensitive material tip lookup with random choice among 3 tips.
+    Fallback to action-level tips, then to a generic default.
+    """
+    # Try material tips (case-insensitive)
+    if label:
+        key = label.strip()
+        if key in TIPS:
+            return _pick_from_list(TIPS[key])
+        low = key.lower()
+        for k in TIPS.keys():
+            if k.lower() == low:
+                return _pick_from_list(TIPS[k])
+    # Fallback to action-level tips
+    if action and action in ACTION_TIPS:
+        return _pick_from_list(ACTION_TIPS[action])
+    return "Check local recycling guidelines for your area."
 
 # ---------------- Blueprints ----------------
 app.register_blueprint(auth_bp)  # /login, /signup, /api/logout
@@ -177,19 +253,15 @@ app.register_blueprint(auth_bp)  # /login, /signup, /api/logout
 def api_logout_alias():
     return bp_api_logout()
 
-
-
 @app.route("/dashboard")
 @login_required
 def dashboard():
     return render_template("progress.html")
 
-
 # ---------------- Pages ----------------
 @app.route("/", endpoint="index")
 def home():
     return render_template("home.html")  # or "index.html" if that's your file
-
 
 # --- keep this public ---
 @app.route("/charities")
@@ -252,7 +324,7 @@ def process_image():
             "why": "Low confidence prediction. Try another angle or better light.",
             "confidence": confidence,
             "confidence_text": f"{confidence*100:.1f} % (low)",
-            "tip": TIPS.get("Unsure"),
+            "tip": _tip_for("Unsure", "Unsure"),
             "abstained": True
         }
         try:
@@ -290,7 +362,7 @@ def process_image():
         "why": why,
         "confidence": confidence,
         "confidence_text": f"{confidence*100:.1f} % Confidence Score",
-        "tip": TIPS.get(label, "Check local recycling guidelines for your area."),
+        "tip": _tip_for(label, action),
         "abstained": False
     })
 

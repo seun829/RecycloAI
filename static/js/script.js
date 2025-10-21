@@ -9,25 +9,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Optional inputs (add these to your HTML if you want):
   // <input id="city-input" placeholder="City (e.g., Austin, TX)">
-  // <label><input id="attr-food_soiled" type="checkbox"> Food-soiled</label>
-  // <label><input id="attr-film" type="checkbox"> Film plastic</label>
-  // <label><input id="attr-rigid" type="checkbox" checked> Rigid plastic</label>
-  // <label><input id="attr-black" type="checkbox"> Black plastic</label>
-  // <label><input id="attr-wet" type="checkbox"> Wet</label>
-  // <label><input id="attr-lined" type="checkbox"> Lined (e.g., paper cup)</label>
+  // <label><input id="attr-soft_bag" type="checkbox"> Film plastic (soft bag)</label>
   // <label><input id="attr-foam" type="checkbox"> Foam / EPS</label>
+  // <label><input id="attr-paper_cup" type="checkbox"> Paper cup</label>
+  // <label><input id="attr-carton" type="checkbox"> Carton (milk/juice)</label>
+  // <label><input id="attr-greasy_or_wet" type="checkbox"> Food-soiled / wet</label>
   // <label><input id="attr-hazard" type="checkbox"> Hazard</label>
   const cityInput = document.getElementById("city-input");
   const attrIds = [
     "soft_bag",
     "foam",
-    "paper_cup_or_carton",
+    "paper_cup",
+    "carton",
     "greasy_or_wet",
     // "hazard" is optional to send; include if you want:
-    "hazard"
+    "hazard",
   ];
-
-  const attrEls = Object.fromEntries(attrIds.map(id => [id, document.getElementById(`attr-${id}`)]));
+  const attrEls = Object.fromEntries(
+    attrIds.map((id) => [id, document.getElementById(`attr-${id}`)])
+  );
 
   // avoid duplicate bindings
   if (!analyzeBtn || analyzeBtn.dataset.bound === "true") return;
@@ -73,8 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try { await video.play(); } catch (_) {}
 
     analyzeBtn.disabled = false;
-    startBtn.textContent = "Camera On";
-    startBtn.disabled = true;
+    startBtn && (startBtn.textContent = "Camera On");
+    startBtn && (startBtn.disabled = true);
 
     window.addEventListener("beforeunload", () => stream?.getTracks().forEach(t => t.stop()));
   }
@@ -113,18 +113,73 @@ document.addEventListener("DOMContentLoaded", () => {
     return canvas;
   }
 
-  async function sendImagePayload(imageData) {
-    const { city, attrs } = collectContext();
-    const res = await fetch("/process_image", {
+  // Resize & convert any image File to a JPEG data URL
+  async function fileToJpegDataURL(file, { maxDim = 1600, quality = 0.85 } = {}) {
+    // Prefer createImageBitmap for speed & orientation handling where supported
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch {
+      // Fallback: load via <img>
+      const url = URL.createObjectURL(file);
+      try {
+        bitmap = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = url;
+        });
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    const { width: w0, height: h0 } = bitmap;
+    const scale = Math.min(1, maxDim / Math.max(w0, h0));
+    const w = Math.round(w0 * scale);
+    const h = Math.round(h0 * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(bitmap, 0, 0, w, h);
+
+    // Produce JPEG; keeps payload small and avoids HEIC/PNG backend issues
+    return canvas.toDataURL("image/jpeg", quality);
+  }
+
+  // POST JSON and surface non-JSON errors (like 413/415) nicely
+  async function postJson(url, payload) {
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image_data: imageData, city, attrs })
+      credentials: "same-origin",
+      body: JSON.stringify(payload),
     });
-    return res.json();
+
+    const status = res.status;
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = { error: text || res.statusText || "Unknown error" }; }
+
+    if (!res.ok) {
+      let hint = "";
+      if (status === 413) hint = " (image too large — try a smaller photo)";
+      if (status === 415) hint = " (unsupported format — JPEG should fix)";
+      if (!data.error) data.error = `HTTP ${status}${hint}`;
+      else data.error += hint;
+    }
+    return data;
+  }
+
+  async function sendImagePayload(imageData) {
+    const { city, attrs } = collectContext();
+    return postJson("/process_image", { image_data: imageData, city, attrs });
   }
 
   async function sendCanvas(canvas) {
-    const imageData = canvas.toDataURL("image/jpeg");
+    const imageData = canvas.toDataURL("image/jpeg", 0.85);
     return sendImagePayload(imageData);
   }
 
@@ -190,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data?.error) {
         console.error(data.error);
         alert("Error: " + data.error);
-      } else {
+      } else if (data) {
         renderResult(data);
       }
     } catch (err) {
@@ -203,56 +258,74 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Upload fallback
-  uploadBtn?.addEventListener("click", () => photoInput?.click());
+  // Upload fallback (resize + JPEG convert + friendly errors)
   photoInput?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const data = await sendImagePayload(reader.result);
-        if (data?.error) {
-          console.error(data.error);
-          alert("Error: " + data.error);
-        } else {
-          renderResult(data);
-        }
-      } catch (err) {
-        console.error("Upload processing error:", err);
-        alert("Couldn’t process the uploaded photo.");
-      } finally {
-        photoInput.value = ""; // allow same file later
+    const prev = analyzeBtn.textContent;
+    analyzeBtn.textContent = "Uploading…";
+    analyzeBtn.disabled = true;
+
+    try {
+      const dataUrl = await fileToJpegDataURL(file, { maxDim: 1600, quality: 0.85 });
+      const data = await sendImagePayload(dataUrl);
+      if (data?.error) {
+        console.error(data.error);
+        alert("Error: " + data.error);
+      } else {
+        renderResult(data);
       }
-    };
-    reader.onerror = (err) => console.error("File read error:", err);
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Upload processing error:", err);
+      alert("Couldn’t process the uploaded photo.");
+    } finally {
+      photoInput.value = ""; // allow same file later
+      analyzeBtn.textContent = prev;
+      analyzeBtn.disabled = false;
+    }
   });
+
+  uploadBtn?.addEventListener("click", () => photoInput?.click());
 });
 
-// Append a classification log to localStorage so Progress can read it
-(function(){
+/* --- Classification logging (local + server) ---------------------------------
+
+Call after you compute a result to persist it locally and to your backend:
+
+saveClassification({
+  label: result.label,            // "Recyclable" | "Compost" | "Landfill" | "Other"
+  confidence: result.confidence,  // optional number (0..1 or 0..100; either is accepted)
+  city: document.getElementById("city-input")?.value || "default"
+});
+
+----------------------------------------------------------------------------- */
+
+// Unified saveClassification: append to localStorage and POST to /api/logs
+async function saveClassification({ label, confidence, city }) {
+  // Normalize confidence
+  const confNum = (typeof confidence === "number" ? confidence : Number(confidence));
+  const normalized = Number.isFinite(confNum) ? confNum : null;
+
+  // LocalStorage log (keeps last 10k)
   const LS_KEY = "recycloai_logs";
   function load(){ try { return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); } catch { return []; } }
   function save(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
-
-  window.saveClassification = function({ label, confidence, city }){
+  try {
     const logs = load();
     logs.push({
       ts: Date.now(),
-      label,                    // e.g., "Recyclable" / "Compost" / "Landfill" / "Other"
-      confidence: Number(confidence) || null, // 0..1 or %
+      label,                                  // e.g., "Recyclable" / "Compost" / "Landfill" / "Other"
+      confidence: normalized,                 // 0..1 or 0..100
       city: city || document.getElementById("city-input")?.value || ""
     });
-    // keep it tidy (last 10k)
     if (logs.length > 10000) logs.splice(0, logs.length - 10000);
     save(logs);
-  };
-})();
+  } catch (e) {
+    console.warn("local log save failed", e);
+  }
 
-// Save a classification to the signed-in user's account
-async function saveClassification({ label, confidence, city }) {
+  // Remote log (silent failure OK)
   try {
     await fetch("/api/logs", {
       method: "POST",
@@ -260,21 +333,14 @@ async function saveClassification({ label, confidence, city }) {
       credentials: "same-origin",
       body: JSON.stringify({
         label,
-        confidence: (typeof confidence === "number" ? confidence : Number(confidence) || null),
+        confidence: normalized,
         city: city || document.getElementById("city-input")?.value || ""
       })
     });
   } catch (e) {
-    // Silently ignore if offline/not logged in
-    console.warn("log save failed", e);
+    console.warn("remote log save failed", e);
   }
 }
-
-/* Example: AFTER you compute a result, call:
-saveClassification({
-  label: result.label,           // "Recyclable" | "Compost" | "Landfill" | "Other"
-  confidence: result.confidence, // optional number (0..1 or 0..100; we accept either)
-  city: /* optional */ 
 
 // --- Persist <details> open/close state for Tips ---
 (function(){
