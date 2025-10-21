@@ -1,11 +1,12 @@
 # policy_engine.py
 from rules import RULES
 
-PRIORITY_ATTRS = ["soft_bag", "foam", "paper_cup_or_carton", "greasy_or_wet", "hazard"]
+PRIORITY_ATTRS = ["soft_bag", "foam", "paper_cup", "carton", "greasy_or_wet", "hazard"]
 ATTR_LABELS = {
     "soft_bag": "Soft bag / plastic wrap",
     "foam": "Foam / Styrofoam",
-    "paper_cup_or_carton": "Paper cup or carton",
+    "paper_cup": "Paper cup ",
+    "carton": "Carton",
     "greasy_or_wet": "Greasy or wet",
     "hazard": "Hazardous item",
 }

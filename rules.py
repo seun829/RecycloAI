@@ -1,44 +1,33 @@
 # rules.py
-# Attributes (plain): soft_bag, foam, paper_cup_or_carton, greasy_or_wet
+# Attributes (plain): soft_bag, foam, greasy_or_wet, paper_cup, carton
 # City keys are case-insensitive; unknown cities fall back to "default".
 
 RULES = {
     "default": {
-        # Plastics
-        # - soft_bag: plastic bags/wrap (scrunchable) → Drop-off
-        # - foam: Styrofoam/expanded polystyrene → Landfill
-        # - rigid containers → Recyclable
         "Plastic": {
             "soft_bag": "Drop-off",
             "foam": "Landfill",
             "default": "Recyclable",
         },
-
-        # Paper & cardboard
-        # - greasy_or_wet: oily/soiled pizza boxes, wet cardboard → Landfill
-        # - paper_cup_or_carton: lined cups/cartons → Landfill
         "Paper": {
             "greasy_or_wet": "Landfill",
-            "paper_cup_or_carton": "Landfill",
+            "paper_cup": "Landfill",
+            "carton": "Recyclable",
             "default": "Recyclable",
         },
         "Cardboard": {
             "greasy_or_wet": "Landfill",
             "default": "Recyclable",
         },
-
-        # Metals & glass widely recyclable
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
-
-        # Catch-all
         "Trash": {"default": "Landfill"},
     },
 
-    # --- Cities with curbside organics/compost (greasy paper → Compost) ---
+    # --- Cities with curbside organics that accept food-soiled paper ---
     "austin": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -46,7 +35,7 @@ RULES = {
     },
     "san francisco": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Compost", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -54,7 +43,7 @@ RULES = {
     },
     "seattle": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Compost", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -62,41 +51,41 @@ RULES = {
     },
     "portland": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
         "Trash": {"default": "Landfill"},
     },
-    "san jose": {  # compost/organics accepted
+    "san jose": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
-        "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
+        "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
         "Trash": {"default": "Landfill"},
     },
-    "denver": {   # curbside compost available in many areas
+    "denver": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
-        "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Recyclable", "carton": "Recyclable", "default": "Recyclable"},
+        "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
         "Trash": {"default": "Landfill"},
     },
 
-    # --- Big cities (no universal curbside compost) → conservative on greasy paper ---
+    # --- Big cities (rules vary) ---
     "new york": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
-        "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
+        "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
         "Trash": {"default": "Landfill"},
     },
     "los angeles": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Compost", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -104,7 +93,7 @@ RULES = {
     },
     "chicago": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -112,7 +101,7 @@ RULES = {
     },
     "boston": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -120,7 +109,7 @@ RULES = {
     },
     "philadelphia": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -128,7 +117,7 @@ RULES = {
     },
     "houston": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -136,7 +125,7 @@ RULES = {
     },
     "miami": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -144,7 +133,7 @@ RULES = {
     },
     "phoenix": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -152,7 +141,7 @@ RULES = {
     },
     "washington": {  # Washington, DC
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -160,7 +149,7 @@ RULES = {
     },
     "atlanta": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Landfill", "paper_cup": "Landfill", "carton": "Recyclable", "default": "Recyclable"},
         "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
@@ -168,8 +157,8 @@ RULES = {
     },
     "minneapolis": {
         "Plastic": {"soft_bag": "Drop-off", "foam": "Landfill", "default": "Recyclable"},
-        "Paper": {"greasy_or_wet": "Landfill", "paper_cup_or_carton": "Landfill", "default": "Recyclable"},
-        "Cardboard": {"greasy_or_wet": "Landfill", "default": "Recyclable"},
+        "Paper": {"greasy_or_wet": "Compost", "paper_cup": "Compost", "carton": "Recyclable", "default": "Recyclable"},
+        "Cardboard": {"greasy_or_wet": "Compost", "default": "Recyclable"},
         "Metal": {"default": "Recyclable"},
         "Glass": {"default": "Recyclable"},
         "Trash": {"default": "Landfill"},
