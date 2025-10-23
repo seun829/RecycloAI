@@ -1,7 +1,38 @@
 const $ = (s, c=document) => c.querySelector(s);
 
-function fmtLocal(tsIso){
-  try { return new Date(tsIso).toLocaleString(); } catch { return tsIso; }
+function fmtLocal(input){
+  try {
+    if (input == null) return "";
+
+    // Handle numeric epoch (seconds or milliseconds)
+    if (typeof input === "number") {
+      const ms = input < 1e12 ? input * 1000 : input;
+      return new Date(ms).toLocaleString(undefined, {
+        hour12: false,
+        timeZoneName: "short"
+      });
+    }
+
+    let s = String(input).trim();
+
+    // Convert "YYYY-MM-DD HH:mm:ss" to ISO-friendly form
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) {
+      s = s.replace(" ", "T");
+    }
+
+    // Add 'Z' if timestamp lacks timezone info (treat as UTC)
+    const hasTZ = /([zZ]|[+\-]\d{2}:\d{2})$/.test(s);
+    const d = new Date(hasTZ ? s : s + "Z");
+
+    if (isNaN(d)) return s;
+
+    return d.toLocaleString(undefined, {
+      hour12: false,
+      timeZoneName: "short"
+    });
+  } catch {
+    return String(input);
+  }
 }
 
 async function fetchJSON(url){
@@ -110,7 +141,6 @@ async function loadAll(){
 
   document.getElementById("clearLogs").onclick = async () => {
     if (!confirm("Clear all your saved logs?")) return;
-    // server-side clear for this user
     await fetch("/api/logs", { method:"DELETE", credentials:"same-origin" }).catch(()=>{});
     location.reload();
   };
