@@ -162,34 +162,34 @@ def prepare_image(img: Image.Image) -> torch.Tensor:
 # ---------------- Tips (3 per class/action) + random selection ----------------
 TIPS = {
     "Cardboard": [
-        "Flatten boxes to save bin space and keep them dry.",
-        "Remove excessive tape and labels if possible.",
-        "Large boxes? Cut them down to 2×2 ft pieces."
+        "Most recycling bins accept clean cardboard — look for the blue or green bin with the recycling logo.",
+        "If you have too much, take flattened boxes to a local recycling drop-off center or grocery store collection point.",
+        "Wet or food-soiled cardboard (like greasy pizza boxes) usually goes in the trash or compost, depending on city rules."
     ],
     "Glass": [
-        "Rinse bottles and jars; remove caps and lids.",
-        "Only bottles and jars are accepted in most cities.",
-        "Avoid breaking glass—loose shards can contaminate."
+        "Recycle bottles and jars in your household recycling bin if your city accepts glass — check your city’s website or A-Z waste guide.",
+        "If curbside glass recycling isn’t available, bring clean bottles and jars to a community recycling drop-off or bottle depot.",
+        "Broken glass should go in the trash (wrapped safely) — it’s not recyclable curbside in most places."
     ],
     "Metal": [
-        "Rinse food and beverage cans before recycling.",
-        "Crushing cans is optional but saves space.",
-        "Foil is OK if it’s clean and balled up."
+        "Empty and rinse cans — then put them in your curbside recycling bin if your area accepts metal.",
+        "If you have scrap metal (like wires or tools), take it to a local scrap yard or recycling center — many pay for metal.",
+        "Clean aluminum foil can go in recycling if your city allows it; otherwise, collect and drop it off with metals at a facility."
     ],
     "Paper": [
-        "Keep paper clean and dry; wet paper belongs in trash/compost per city rules.",
-        "No greasy pizza boxes unless your city allows food-soiled paper in organics.",
-        "Remove plastic windows from envelopes if easy; not required in many programs."
+        "Most clean paper (like office paper, mail, newspapers) goes in your curbside recycling bin.",
+        "Check with your city if they accept shredded paper — some want it bagged, others ask for drop-off only.",
+        "Glossy, waxy, or dirty paper (like takeout boxes) often goes in the trash or compost instead."
     ],
     "Plastic": [
-        "Rinse and empty; caps on or off depends on your city (on is common).",
-        "Prioritize #1 and #2 bottles and jugs—most widely accepted.",
-        "If it’s soft, scrunchable film, take it to store drop-off (not curbside)."
+        "Look for a recycling symbol (♻️) with numbers 1–2 — these are accepted in most curbside programs.",
+        "If your plastic is soft or flexible (like bags or wraps), take it to store collection bins labeled ‘Plastic Film Recycling’.",
+        "When unsure, search your local recycling guide by item name (e.g., 'plastic cup') — it’ll tell you where to drop it off."
     ],
     "Trash": [
-        "This item isn’t accepted curbside—avoid wish-cycling.",
-        "When in doubt, check your city’s A-Z guide for proper disposal.",
-        "Consider reusing the item or choosing a reusable alternative next time."
+        "If it can’t go in your recycling or compost, it belongs in the trash bin.",
+        "Check your city’s disposal guide — some items (like batteries or electronics) need special drop-off locations.",
+        "When possible, look for reuse options — donation centers, repair shops, or creative reuse stores often accept items."
     ],
     "Unsure": [
         "Try another angle, better lighting, or remove background clutter.",
@@ -197,6 +197,7 @@ TIPS = {
         "Check your local recycling guide for specific items."
     ],
 }
+
 
 ACTION_TIPS = {
     "Recyclable": [
