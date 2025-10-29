@@ -22,8 +22,6 @@ RecycloAI is an interactive application that integrates a smart recycling assist
 python -m venv .venv
 source .venv/bin/activate           # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-# Additional packages used by the code but not listed in requirements.txt:
-pip install flask datasets
 ```
 
 ## Quickstart
