@@ -7,12 +7,12 @@ RecycloAI is an interactive application that integrates a smart recycling assist
 - HTML, CSS, JavaScript, and Python used
 - /data is where all the training data lives, python scripts in /src were used to fetch and put the data in the correct folder. A training script is included in /src and the best model was saved as a best_efficientnet_model.pth
 - /static holds all css and js files, along with a json with all of the charities and their info. It includes the html templates as well, listed under /templates.
-- Other miscellaneous python files are used for integrating local guidelines and login information
+- Other miscellaneous python files are used for integrating local guidelines and login information under /misc
 - recycloai.db holds all the relevant user information
 ---
 
 ## Objectives:
-- Determine output class of an object at hand
+- Determine output class of an object at hand using an image from file upload or camera(i.e phone)
 - Combine with local guidelines + context given to reach a final recyclability consensus
 - Give a tip relating to that object
 - Update progress bars + logs
@@ -20,7 +20,13 @@ RecycloAI is an interactive application that integrates a smart recycling assist
 
 ---
 
-
+## Future Work:
+- Adaptive UI based on device
+- Automating data collection about charities
+- Larger scale data management
+- Features allowing contact between two or more different users
+- More tailored tips and recommendations
+---
 
 ## Installation
 **Python 3.10+** recommended.

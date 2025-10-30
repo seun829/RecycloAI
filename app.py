@@ -16,13 +16,13 @@ import torch.nn.functional as F
 from torchvision import models
 from torchvision.models import EfficientNet_B0_Weights
 
-# Local modules
-from extensions import db, login_manager
-from models import User, ClassificationLog, normalize_label
-from auth import auth_bp, login_required, current_user  # re-exported from auth
-from auth import auth_bp, api_logout as bp_api_logout
+# Miscellaneous imports from misc/
+from misc.extensions import db, login_manager
+from misc.models import User, ClassificationLog, normalize_label
+from misc.auth import auth_bp, login_required, current_user  # re-exported from auth
+from misc.auth import auth_bp, api_logout as bp_api_logout
 
-from policy_engine import decide_action
+from misc.policy_engine import decide_action
 
 # ---------------- App & Config ----------------
 app = Flask(__name__)

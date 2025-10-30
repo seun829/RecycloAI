@@ -1,5 +1,5 @@
 # policy_engine.py
-from rules import RULES
+from misc.rules import RULES
 
 PRIORITY_ATTRS = ["soft_bag", "foam", "paper_cup", "carton", "greasy_or_wet", "hazard"]
 ATTR_LABELS = {
