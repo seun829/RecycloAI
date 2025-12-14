@@ -1,5 +1,4 @@
 Flask==2.3.3
-pillow requests
 SQLAlchemy==1.4.46
 torchvision
 numpy==1.24.3
