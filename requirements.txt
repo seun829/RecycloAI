@@ -1,9 +1,13 @@
 Flask==2.3.3
+Werkzeug==2.3.7
+gunicorn
+
+Flask-SQLAlchemy==3.0.5
 SQLAlchemy==1.4.46
+Flask-Login
+
+torch
 torchvision
 numpy==1.24.3
-werkzeug==2.3.6
 pillow
 requests
-torch
-gunicorn
