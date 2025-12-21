@@ -3,3 +3,6 @@ SQLAlchemy==1.4.46
 torchvision
 numpy==1.24.3
 werkzeug==2.3.6
+pillow
+requests
+torch
